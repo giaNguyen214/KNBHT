@@ -9,7 +9,7 @@ export const useSearch = () => {
   const [searching, setSearching] = useState(false);
 
   const search = async (type: string, searchPayload: SearchPayload) => {
-    console.log(`search payload ${type}`, searchPayload)
+    // console.log(`search payload ${type}`, searchPayload)
     setSearching(true);
     try {
       let data;
@@ -18,7 +18,7 @@ export const useSearch = () => {
       } else {
         data = await temporalSearch(searchPayload);
       }
-      console.log("data", data)
+    //   console.log("data", data)
       setResults(data?.results || []);
     //   setResults(data || [])
     } catch (error) {

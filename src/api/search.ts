@@ -11,7 +11,7 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
         color_filters: searchPayload.color_filters || [],
         ocr_query: searchPayload.ocr_query,
         asr_query: searchPayload.asr_query,
-        top_k: 10
+        top_k: searchPayload.top_k
     };
 
     const response = await axiosClient.post(API_CONFIG.ENDPOINTS.SEARCH.SIMPLE, payload)
