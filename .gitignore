@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# keyframes
+/public/assets/keyframes/
+src/itemData.json
