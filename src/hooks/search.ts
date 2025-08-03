@@ -18,8 +18,9 @@ export const useSearch = () => {
       } else {
         data = await temporalSearch(searchPayload);
       }
-    //   setResults(data?.results || []);
-      setResults(data || [])
+      console.log("data", data)
+      setResults(data?.results || []);
+    //   setResults(data || [])
     } catch (error) {
       console.error("Search error:", error);
     } finally {

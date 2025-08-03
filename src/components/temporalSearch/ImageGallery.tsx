@@ -33,9 +33,10 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
 
     return (
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
-            <ImageList cols={cols} gap={12}>
+            <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
                 {results.map((item, index) => {
-                    const imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
+                    // const imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
+                    const imgSrc = `${base_folder}/${item.keyframe_id}`;
                     // console.log("img source", imgSrc)
                     const imgTitle = `${item.video_id}_${item.keyframe_id}`;
                     return (
@@ -56,7 +57,7 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
                                     right: "8px",
                                     backgroundColor: `${showList[index] ? "rgba(255, 255, 255, 0.5)" : "red"}`,
                                     "&:hover": {
-                                        backgroundColor: "rgba(255, 255, 255, 0.7)",
+                                        backgroundColor: `${showList[index] ? "rgba(255, 255, 255, 0.7)" : "red"}`,
                                     },
                                 }}
                             >
