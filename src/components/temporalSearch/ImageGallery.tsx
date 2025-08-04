@@ -16,8 +16,12 @@ import { ImageGalleryProps } from "@/types/Query";
 
 import { base_folder } from "@/constants/keyframe";
 
-export default function ImageGallery( {results, cols, gap, className }: ImageGalleryProps ) {
-    const [showList, setShowList] = useState<boolean[]>([]);
+import { useIgnoreContext } from "@/contexts/searchContext";
+
+export default function ImageGallery( {results, cols, className }: ImageGalleryProps ) {
+    const {showList, setShowList} = useIgnoreContext()
+    // const [showList, setShowList] = useState<boolean[]>([])
+
     // Khi results thay đổi, reset showList cho đúng số lượng item
     useEffect(() => {
         setShowList(Array(results.length).fill(true));
@@ -35,9 +39,10 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
                 {results.map((item, index) => {
+                    console.log("Render item", index);
                     let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
                     if (process.env.NEXT_PUBLIC_MODE === "test") {
-                    imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
+                        imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
                     }
 
 

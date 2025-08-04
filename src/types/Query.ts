@@ -22,7 +22,6 @@ export type QueryProps = {
 export type ImageGalleryProps = {
   results: any[]; 
   cols: number;
-  gap?: number;
   className?: string
 };
 
@@ -44,3 +43,8 @@ export type SearchResultContextType = {
   cols: number | "";
   setCols: React.Dispatch<React.SetStateAction<number | "">>;
 };
+
+export type IgnoreContextType = {
+  showList: boolean[];
+  setShowList: React.Dispatch<React.SetStateAction<boolean[]>>;
+}

@@ -14,6 +14,9 @@ import PopupAlert from "../utils/Popup";
 import { useSearchContext, useSearchResultContext } from "@/contexts/searchContext";
 import { useState } from "react";
 
+import { useIgnoreContext } from "@/contexts/searchContext";
+import axios from "axios";
+
 export default function SubscreenA() {
     const { query, mode } = useSearchContext();
     const {searching, handleSearch} = useSearchResultContext()
@@ -73,6 +76,37 @@ export default function SubscreenA() {
     };
 
     const [autoIgnore, setAutoIgnore] = useState(false);
+    const {showList, setShowList} = useIgnoreContext()
+    const {results} = useSearchResultContext()
+    const sendHiddenTitles = async () => {
+        const hiddenTitles = results
+            .filter((_, idx) => !showList[idx])
+            .map(item => `${item.video_id}_${item.keyframe_id}`);
+
+        try {
+            console.log("hidden titles: ", hiddenTitles)
+            await axios.post("/api/hide-list", { hiddenTitles });
+            console.log("Đã gửi thành công!");
+        } catch (err) {
+            console.error("Lỗi khi gửi:", err);
+        }
+    };
+
+    const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
+    const handleAutoIgnoreChange = () => {
+        if (!autoIgnore) {
+            // Trường hợp đang OFF -> Bật ON
+            setPrevShowList(showList); // lưu trạng thái trước đó
+            setShowList(Array(showList.length).fill(false)); // hide hết
+            setAutoIgnore(true);
+        } else {
+            // Trường hợp đang ON -> Tắt OFF
+            if (prevShowList.length > 0) {
+                setShowList(prevShowList); // khôi phục trạng thái cũ
+            }
+            setAutoIgnore(false);
+        }
+    };
     return (
         <Box className="w-full h-full border border-solid border-black">
             <Box className="flex-1 flex flex-col justify-center items-center gap-2 p-2">
@@ -124,37 +158,39 @@ export default function SubscreenA() {
                 />
 
                 <Box className="flex justify-center items-center gap-10">
-                    <TextField
-                        label="Top K"
-                        type="number"
-                        variant="outlined"
-                        value={topK}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setTopK(val === "" ? "" : Number(val));
-                        }}
-                        slotProps={{
-                            input: {
-                                inputProps: {
-                                    min: 0,
-                                    max: 100000,
-                                    step: 1,
-                                },
-                            },
-                        }}
-                        size="small"
-                    />
-
-                    <FormControlLabel
-                        label="Auto Ignore"
-                        control={
-                            <Checkbox
-                                checked={autoIgnore}
-                                onChange={() => setAutoIgnore(!autoIgnore)}
-                                color="success"
-                            />
-                        }
+                    <Box className="flex justify-center items-center gap-2 border p-2">
+                        <FormControlLabel
+                            label="Auto Ignore"
+                            slotProps={{
+                                typography: {
+                                    fontFamily: "monospace",
+                                    fontSize: "15px",
+                                    color:'green'
+                                }
+                            }}
+                            control={
+                                <Checkbox
+                                    checked={autoIgnore}
+                                    onChange={handleAutoIgnoreChange}
+                                    color="success"
+                                />
+                            }
                         />
+
+                        <Button 
+                            variant="contained" 
+                            sx={{
+                                backgroundColor: "#9c27b0",
+                                "&:hover": { backgroundColor: "#7b1fa2" },
+                                "&:active": { backgroundColor: "#4a148c" },
+                                color: "white",
+                                textTransform: "none",
+                            }}
+                            onClick={sendHiddenTitles}
+                            >
+                            Ignore
+                        </Button>
+                    </Box>
 
                     <Button variant="contained" onClick={onFilterClick}>
                         {searching ? "filtering..." : "Filter"}

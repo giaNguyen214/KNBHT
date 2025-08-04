@@ -14,7 +14,7 @@ export default function SubscreenB() {
     return (
         <Box className="w-full h-full p-2 overflow-y-scroll max-h-full border border-solid border-black">
             <Box className="h-[calc(100%-2rem)] w-full">
-                <ImageGallery results={results} cols={2} gap={12} className="w-full h-auto" />
+                <ImageGallery results={results} cols={2} className="w-full h-auto" />
             </Box>
 
         </Box>

@@ -3,7 +3,8 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { SearchContextType, SearchResultContextType } from "@/types/Query";
 import { useSearch } from "@/hooks/search"
-import { SearchPayload } from "@/types/Search"
+import { SearchPayload} from "@/types/Search"
+import { IgnoreContextType } from "@/types/Query";
 import { useEffect } from "react";
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
@@ -59,6 +60,26 @@ export function useSearchResultContext() {
   const ctx = useContext(SearchResultContext);
   if (!ctx) {
     throw new Error("useSearchContext must be used within a SearchProvider");
+  }
+  return ctx;
+}
+
+
+const IgnoreContext = createContext<IgnoreContextType | undefined>(undefined);
+
+export function IgnoreProvider({ children }: { children: ReactNode }) {
+  const [showList, setShowList] = useState<boolean[]>([]);
+  return (
+    <IgnoreContext.Provider value={{ showList, setShowList }}>
+      {children}
+    </IgnoreContext.Provider>
+  );
+}
+
+export function useIgnoreContext() {
+  const ctx = useContext(IgnoreContext);
+  if (!ctx) {
+    throw new Error("useIgnoreContext must be used within a SearchProvider");
   }
   return ctx;
 }
