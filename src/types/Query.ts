@@ -31,10 +31,16 @@ export type SearchContextType = {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
   mode: string;
   setMode: React.Dispatch<React.SetStateAction<string>>;
+  queryName: string;
+  setQueryName: React.Dispatch<React.SetStateAction<string>>;
+  dataSource: string;
+  setDataSource: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export type SearchResultContextType = {
   results: any[];
   searching: boolean;
-  handleSearch: (searchPaylod: SearchPayload) => void
+  handleSearch: (searchPaylod: SearchPayload) => void;
+  cols: number | "";
+  setCols: React.Dispatch<React.SetStateAction<number | "">>;
 };

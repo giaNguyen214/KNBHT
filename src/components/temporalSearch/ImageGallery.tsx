@@ -35,8 +35,12 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
                 {results.map((item, index) => {
-                    // const imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
-                    const imgSrc = `${base_folder}/${item.keyframe_id}`;
+                    let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
+                    if (process.env.NEXT_PUBLIC_MODE === "test") {
+                    imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
+                    }
+
+
                     // console.log("img source", imgSrc)
                     const imgTitle = `${item.video_id}_${item.keyframe_id}`;
                     return (
@@ -53,8 +57,9 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
                                 onClick={() => toggleShow(index)}
                                 sx={{
                                     position: "absolute",
-                                    bottom: "8px",
-                                    right: "8px",
+                                    bottom: "5px",
+                                    right: "5px",
+                                    p: "4px",
                                     backgroundColor: `${showList[index] ? "rgba(255, 255, 255, 0.5)" : "red"}`,
                                     "&:hover": {
                                         backgroundColor: `${showList[index] ? "rgba(255, 255, 255, 0.7)" : "red"}`,
@@ -62,9 +67,9 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
                                 }}
                             >
                                 {showList[index] ? (
-                                    <VisibilityIcon sx={{ color: "black" }} />
+                                    <VisibilityIcon sx={{ color: "black", fontSize: 18 }} />
                                 ) : (
-                                    <VisibilityOffIcon sx={{ color: "black"}} />
+                                    <VisibilityOffIcon sx={{ color: "black", fontSize: 18 }} />
                                 )}
                             </IconButton>
 
@@ -73,15 +78,16 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
                                 onClick={() => setOpenImage({ img: imgSrc, title: imgTitle })}
                                 sx={{
                                     position: "absolute",
-                                    bottom: "8px",
-                                    left: "8px",
+                                    bottom: "5px",
+                                    left: "5px",
+                                    p: "4px",
                                     backgroundColor: "rgba(255, 255, 255, 0.5)",
                                     "&:hover": {
                                         backgroundColor: "rgba(255, 255, 255, 0.7)",
                                     },
                                 }}
                             >
-                                <FullscreenIcon sx={{ color: "black" }} />
+                                <FullscreenIcon sx={{ color: "black", fontSize: 18 }} />
                             </IconButton>
 
                             {/* keyframe id */}
@@ -91,7 +97,7 @@ export default function ImageGallery( {results, cols, gap, className }: ImageGal
                                     top: "8px",
                                     left: "8px", 
                                     color: 'white',
-                                    fontSize:'15px',
+                                    fontSize:'10px',
                                     userSelect: "text",
                                     pointerEvents: "auto",
                                     fontFamily:'monospace'

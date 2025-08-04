@@ -19,8 +19,12 @@ export const useSearch = () => {
         data = await temporalSearch(searchPayload);
       }
     //   console.log("data", data)
+      if (process.env.NEXT_PUBLIC_MODE === "test") {
+        setResults(data || [])
+        return
+      }
       setResults(data?.results || []);
-    //   setResults(data || [])
+    
     } catch (error) {
       console.error("Search error:", error);
     } finally {

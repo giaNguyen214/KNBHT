@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import { AvatarProps } from "@/types/Utils"
+import { useState, useEffect } from 'react';
 
 function stringToColor(string: string) {
   let hash = 0;
@@ -31,8 +31,16 @@ function stringAvatar(name: string) {
   };
 }
 
-export default function CustomAvatar( {name} :AvatarProps) {
+export default function CustomAvatar() {
+  const [username, setUsername] = useState<string>("Unknown User");
+  useEffect(() => {
+      const storedUsername = localStorage.getItem("username");
+      if (storedUsername) {
+          setUsername(storedUsername);
+      }
+  }, []);
   return (
-    <Avatar {...stringAvatar(name)} />
+    <Avatar {...stringAvatar(String(username))} />
   );
 }
+

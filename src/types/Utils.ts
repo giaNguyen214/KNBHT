@@ -4,9 +4,6 @@ export type PopupAlertProps = {
     closeModal: () => void;
 };
 
-export type AvatarProps = {
-    name: string
-}
 
 export type LoginProps = {
     closeModal: () => void;

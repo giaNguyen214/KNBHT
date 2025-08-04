@@ -14,9 +14,13 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
         top_k: searchPayload.top_k
     };
 
+
+    if (process.env.NEXT_PUBLIC_MODE === "test") {
+        const response = await axiosClient.get("https://685aaeb59f6ef9611157681f.mockapi.io/dientoangroup/search")
+        return response.data
+    }
+
     const response = await axiosClient.post(API_CONFIG.ENDPOINTS.SEARCH.SIMPLE, payload)
-    
-    // const response = await axiosClient.get("https://685aaeb59f6ef9611157681f.mockapi.io/dientoangroup/search")
     return response.data
 }
 

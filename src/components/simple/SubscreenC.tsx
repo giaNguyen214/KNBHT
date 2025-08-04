@@ -4,7 +4,8 @@ import {
     Box,
     Button,
     TextField,
-    Typography
+    Typography,
+    Checkbox
 } from "@mui/material"
 import * as React from 'react';
 import Radio from '@mui/material/Radio';
@@ -15,10 +16,16 @@ import { useSearchContext, useSearchResultContext } from "@/contexts/searchConte
 import { useState, useEffect } from "react";
 import PopupAlert from "../utils/Popup";
 import CustomAvatar from "../utils/CustomAvatar";
+import { red, orange } from "@mui/material/colors";
+
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function SubscreenC() {
-    const { query, setQuery, mode, setMode } = useSearchContext();
-    const {searching, handleSearch} = useSearchResultContext()
+    const [autoIgnore, setAutoIgnore] = useState(false);
+    const { query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource} = useSearchContext();
+    const {searching, handleSearch, cols, setCols} = useSearchResultContext()
     const [topK, setTopK] = useState<number | "">("")
 
     const [isOpen, setIsOpen] = useState(false)
@@ -49,7 +56,7 @@ export default function SubscreenC() {
         });
     };
 
-    const [username, setUsername] = React.useState<string>("Unknown User");
+    const [username, setUsername] = useState<string>("Unknown User");
     useEffect(() => {
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
@@ -57,10 +64,12 @@ export default function SubscreenC() {
         }
     }, []);
 
+    const handleChangeDataSource = (event: SelectChangeEvent) => {
+      setDataSource(event.target.value as string);
+    };
 
     return (
         <Box className="w-full h-full p-2 border border-solid border-black">
-            <Typography>Subscreen C</Typography>
             <Box className="flex flex-col justify-center items-center">
                 <Box className="w-full p-2 flex justify-center items-center gap-5">
                     <TextField 
@@ -73,7 +82,20 @@ export default function SubscreenC() {
                         fullWidth
                     />
 
-                    <CustomAvatar name={"Unknown User"}/>
+                    <TextField 
+                        id="filled-basic" 
+                        label="Query name" 
+                        variant="filled" 
+                        value={queryName}
+                        onChange={(e) => setQueryName(e.target.value)}
+                        size="small"
+                        fullWidth
+                        sx={{
+                            width: 150
+                        }}
+                    />
+
+                    <CustomAvatar/>
                 </Box>
                 <Box className="flex-1 w-full mt-2 flex justify-around items-center">
                     <FormControl>
@@ -91,7 +113,94 @@ export default function SubscreenC() {
                     </FormControl>
 
 
-                    <Box className="flex justify-center items-center gap-10">
+                    <Box className="flex justify-center items-center gap-2">
+                        <FormControlLabel
+                            label="Auto Ignore"
+                            labelPlacement="top"
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                flexDirection: "column", // 👈 label trên, checkbox dưới
+                                textAlign: "center",
+                                m: 1
+                            }}
+                            slotProps={{
+                                typography: {
+                                    fontFamily: "monospace",
+                                    fontSize: "15px",
+                                    color:'green'
+                                }
+                            }}
+                            control={
+                                <Checkbox
+                                    checked={autoIgnore}
+                                    onChange={() => setAutoIgnore(!autoIgnore)}
+                                    color="success"
+                                />
+                            }
+                        />
+
+                        {/* <FormControlLabel
+                            label="Full database?"
+                            labelPlacement="top"
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                flexDirection: "column", // 👈 label trên, checkbox dưới
+                                textAlign: "center",
+                                m: 1
+                            }}
+                            slotProps={{
+                                typography: {
+                                    fontFamily: "monospace",
+                                    fontSize: "15px",
+                                    color: red[600],
+                                }
+                            }}
+                            control={
+                                <Checkbox
+                                    checked={full}
+                                    onChange={() => setFull(!full)}
+                                    sx={{
+                                        color: red[800],
+                                        '&.Mui-checked': {
+                                            color: red[600],
+                                        },
+                                    }}
+                                />
+                            }
+                        /> */}
+                        <Box sx={{ minWidth: 120 }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label"
+                                    sx={{
+                                        fontSize: 12,
+                                        '&.MuiInputLabel-shrink': {
+                                        transform: 'translate(14px, -6px) scale(0.85)', // đẩy label lên cao hơn
+                                        backgroundColor: 'white', // nếu muốn nền che border
+                                        padding: '0 4px'
+                                        }
+                                    }}>
+                                    Data source?
+                                </InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={dataSource}
+                                    label="Age"
+                                    onChange={handleChangeDataSource}
+                                >
+                                    <MenuItem value={"Gia Nguyên"}>Nguyên</MenuItem>
+                                    <MenuItem value={"Minh Tâm"}>Tâm</MenuItem>
+                                    <MenuItem value={"Lê Hiếu"}>Hiếu</MenuItem>
+                                    <MenuItem value={"Duy Khương"}>Khương</MenuItem>
+                                    <MenuItem value={"Duy Bảo"}>Bảo</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+
+
+
                         <TextField
                             label="Top K"
                             type="number"
@@ -112,6 +221,21 @@ export default function SubscreenC() {
                             }}
                             size="small"
                         />
+                        <TextField
+                            label="Số cột"
+                            type="number"
+                            size="small"
+                            value={cols}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setCols(val === "" ? "" : Number(val));
+                            }}
+                            slotProps={{
+                                htmlInput: { min: 1 }
+                            }}
+                            sx={{ width: 100 }} // 👈 ép nhỏ hơn
+                        />
+
                         <Button variant="contained" onClick={onSearchClick}>
                             {searching ? "đang tìm kiếm..." : "Tìm kiếm"}
                         </Button>

@@ -4,7 +4,9 @@ import {
     Box,
     Typography,
     TextField,
-    Button
+    Button,
+    Checkbox,
+    FormControlLabel
 } from "@mui/material"
 
 import PopupAlert from "../utils/Popup";
@@ -69,9 +71,10 @@ export default function SubscreenA() {
             top_k: topK_value
         });
     };
+
+    const [autoIgnore, setAutoIgnore] = useState(false);
     return (
         <Box className="w-full h-full border border-solid border-black">
-            <Typography>Subscreen A</Typography>
             <Box className="flex-1 flex flex-col justify-center items-center gap-2 p-2">
                 <TextField 
                     id="filled-basic" 
@@ -88,6 +91,7 @@ export default function SubscreenA() {
                     }
                     placeholder="Nhập nhiều object, cách nhau bằng ','"
                     size="small"
+                    
                 />
                 <TextField
                     label="Color"
@@ -140,6 +144,18 @@ export default function SubscreenA() {
                         }}
                         size="small"
                     />
+
+                    <FormControlLabel
+                        label="Auto Ignore"
+                        control={
+                            <Checkbox
+                                checked={autoIgnore}
+                                onChange={() => setAutoIgnore(!autoIgnore)}
+                                color="success"
+                            />
+                        }
+                        />
+
                     <Button variant="contained" onClick={onFilterClick}>
                         {searching ? "filtering..." : "Filter"}
                     </Button>
