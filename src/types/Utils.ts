@@ -8,3 +8,8 @@ export type PopupAlertProps = {
 export type LoginProps = {
     closeModal: () => void;
 };
+
+export interface SidebarProps {
+  open: boolean;
+  setOpen: (state: boolean) => void;
+}

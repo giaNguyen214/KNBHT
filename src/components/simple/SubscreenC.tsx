@@ -22,13 +22,15 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 
+import ResultModal from "../utils/SubmitTable";
+
+import { itemsPerPage } from "@/constants/keyframe";
 import axios from "axios";
 
 export default function SubscreenC() {
     const [autoIgnore, setAutoIgnore] = useState(false);
-    const { query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource} = useSearchContext();
+    const {query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK} = useSearchContext();
     const {searching, handleSearch, cols, setCols} = useSearchResultContext()
-    const [topK, setTopK] = useState<number | "">("")
 
     const [isOpen, setIsOpen] = useState(false)
     const [popupSeverity, setPopupSeverity] = useState<"success" | "info" | "warning" | "error">("info");
@@ -77,15 +79,25 @@ export default function SubscreenC() {
 
     const isDifferent = dataSource !== username;
 
-    const {showList, setShowList} = useIgnoreContext()
+    const {showList, setShowList, currentPage, setCurrentPage} = useIgnoreContext()
     const {results} = useSearchResultContext()
     const sendHiddenTitles = async () => {
         const hiddenTitles = results
             .filter((_, idx) => !showList[idx])
             .map(item => `${item.video_id}_${item.keyframe_id}`);
 
+        if (queryName === "") {
+            alert("Phải chọn Query Name")
+            return
+        }
+        if (hiddenTitles.length === 0) {
+            alert("Chọn ảnh để ignore")
+            return
+        }
+
         try {
             console.log("hidden titles: ", hiddenTitles)
+            console.log("query name", queryName)
             await axios.post("/api/hide-list", { hiddenTitles });
             console.log("Đã gửi thành công!");
         } catch (err) {
@@ -98,7 +110,21 @@ export default function SubscreenC() {
         if (!autoIgnore) {
             // Trường hợp đang OFF -> Bật ON
             setPrevShowList(showList); // lưu trạng thái trước đó
-            setShowList(Array(showList.length).fill(false)); // hide hết
+
+            // setShowList(Array(showList.length).fill(false)); // hide hết
+            // setShowList(Array(itemsPerPage).fill(true));
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            setShowList(prev =>
+                prev.map((val, i) => {
+                    if (i >= startIndex && i < endIndex) {
+                        return false; // hide ảnh trong trang hiện tại
+                    }
+                    return val; // giữ nguyên các trang khác
+                })
+            );
+
             setAutoIgnore(true);
         } else {
             // Trường hợp đang ON -> Tắt OFF
@@ -108,6 +134,27 @@ export default function SubscreenC() {
             setAutoIgnore(false);
         }
     };
+
+
+    const [submit, setSubmit] = useState(false)
+    const closeSubmitModal = () => {
+        setSubmit(false)
+    }
+    const openSubmitModal = () => {
+        if (results.length === 0) {
+            setPopupSeverity("warning");
+            setPopupMessage("Result rỗng. Cần nhấn 'Tìm kiếm' trước!");
+            setIsOpen(true);
+            return;
+        }
+        if (queryName === "") {
+            setPopupSeverity("warning");
+            setPopupMessage("Phải chọn Query name trước");
+            setIsOpen(true);
+            return;
+        }
+        setSubmit(true)
+    }
 
     return (
         <Box className="w-full h-full p-2 border border-solid border-black">
@@ -241,20 +288,20 @@ export default function SubscreenC() {
                             </FormControl>
                         </Box>
 
-                        <Button 
+                        {/* <Button 
                             variant="contained" 
                             sx={{
-  backgroundColor: "#9c27b0",
-  "&:hover": { backgroundColor: "#7b1fa2" },
-  "&:active": { backgroundColor: "#4a148c" },
-  color: "white",
-  textTransform: "none",
-}}
+                                backgroundColor: "#9c27b0",
+                                "&:hover": { backgroundColor: "#7b1fa2" },
+                                "&:active": { backgroundColor: "#4a148c" },
+                                color: "white",
+                                textTransform: "none",
+                            }}
 
                             onClick={sendHiddenTitles}
                             >
                             Ignore
-                        </Button>
+                        </Button> */}
 
                     </Box>
 
@@ -293,6 +340,21 @@ export default function SubscreenC() {
                         <Button variant="contained" onClick={onSearchClick}>
                             {searching ? "đang tìm kiếm..." : "Tìm kiếm"}
                         </Button>
+
+                        <Button
+                            variant="contained"
+                            onClick={openSubmitModal}
+                            sx={{
+                                backgroundColor: '#ff4081',  // Màu nền
+                                color: 'white',               // Màu chữ
+                                '&:hover': {
+                                    backgroundColor: '#f50057' // Màu khi hover
+                                },
+                                borderRadius: '50px',   // Hình pill (dài và bo tròn)
+                            }}
+                        >
+                            Submit
+                        </Button>
                     </Box>
                     
                 </Box>
@@ -303,6 +365,16 @@ export default function SubscreenC() {
                     message={popupMessage}
                     closeModal={closeModal}
                 />
+            )}
+
+            {submit && (
+                <ResultModal
+                    submit={submit}
+                    closeSubmitModal={closeSubmitModal}
+                    results={results}
+                    mode="Search"
+                />
+
             )}
         </Box>
 

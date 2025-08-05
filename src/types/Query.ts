@@ -34,6 +34,8 @@ export type SearchContextType = {
   setQueryName: React.Dispatch<React.SetStateAction<string>>;
   dataSource: string;
   setDataSource: React.Dispatch<React.SetStateAction<string>>;
+  topK: number | "";
+  setTopK: React.Dispatch<React.SetStateAction<number | "">>
 };
 
 export type SearchResultContextType = {
@@ -47,4 +49,7 @@ export type SearchResultContextType = {
 export type IgnoreContextType = {
   showList: boolean[];
   setShowList: React.Dispatch<React.SetStateAction<boolean[]>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+
 }

@@ -13,6 +13,7 @@ import { SearchPayload } from "@/types/Search"
 import { useState, useEffect } from "react"
 import Login from "@/components/utils/Login"
 
+
 export default function Test() {
     // //  logic Login
     // const [username, setUsername] = useState("");
@@ -38,6 +39,8 @@ export default function Test() {
     const handleSearch = (searchPayload: SearchPayload) => {
         search("temporal", searchPayload);
     };
+
+
     return (
         <Box className="h-screen w-screen flex justify-center items-center p-2">
             <DynamicQuery handleSearch={handleSearch} searching={searching}/>

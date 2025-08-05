@@ -12,6 +12,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState("clip");
   const [queryName, setQueryName] = useState("")
+  const [topK, setTopK] = useState<number | "">("")
 
   const [dataSource, setDataSource] = useState("");
   // Lấy localStorage khi chạy ở client
@@ -25,7 +26,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   
 
   return (
-    <SearchContext.Provider value={{ query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource }}>
+    <SearchContext.Provider value={{ query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK }}>
       {children}
     </SearchContext.Provider>
   );
@@ -69,8 +70,11 @@ const IgnoreContext = createContext<IgnoreContextType | undefined>(undefined);
 
 export function IgnoreProvider({ children }: { children: ReactNode }) {
   const [showList, setShowList] = useState<boolean[]>([]);
+  // phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+
   return (
-    <IgnoreContext.Provider value={{ showList, setShowList }}>
+    <IgnoreContext.Provider value={{ showList, setShowList, currentPage, setCurrentPage }}>
       {children}
     </IgnoreContext.Provider>
   );
