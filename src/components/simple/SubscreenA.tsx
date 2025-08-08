@@ -278,40 +278,6 @@ export default function SubscreenA() {
             )}
 
             {submit && (
-                // <Box className="fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,0.6)] flex flex-col justify-center items-center z-[9999] gap-5" onClick={closeSubmitModal}>
-                //     <Box className="max-w-[700px] w-full flex flex-col items-center" onClick={(e) => {e.stopPropagation()}}>
-                //         <Box className="flex justify-around items-center bg-white max-w-[700px] w-full p-2">
-                //             <Typography
-                //                 variant="h6"
-                //                 sx={{
-                //                     color: "#2e7d32", // màu xanh dương nổi bật
-                //                     fontWeight: "bold", // chữ đậm
-                //                     backgroundColor: "#e8f5e9", // nền nhẹ
-                //                     padding: "4px 8px",
-                //                     borderRadius: "4px",
-                //                     display: "inline-block"
-                //                 }}
-                //             >
-                //                 Results của filter
-                //             </Typography>
-                //             <Button variant="contained" size="large">
-                //                 Tải xuống
-                //             </Button>
-                //         </Box>
-                //         <Box className="bg-white p-2 rounded-10 max-w-[700px] w-full h-[80vh] overflow-auto flex flex-col gap-2 p-2">
-                //             <Box>
-                //                 {results.map((item, index) => {
-                //                     console.log("result", results)
-                //                     return (
-                //                         <Box key={index}>
-                //                             {item.video_id} - {item.keyframe_id} - {item.timestamp}
-                //                         </Box>
-                //                     )
-                //                 })}
-                //             </Box>
-                //         </Box>
-                //     </Box>
-                // </Box>
                 <ResultModal
                     submit={submit}
                     closeSubmitModal={closeSubmitModal}

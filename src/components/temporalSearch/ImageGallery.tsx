@@ -21,6 +21,9 @@ import { itemsPerPage } from "@/constants/keyframe";
 import { useIgnoreContext } from "@/contexts/searchContext";
 
 import axios from "axios";
+import CustomAvatar from "../utils/CustomAvatar";
+
+import socket from "@/lib/socket";
 
 export default function ImageGallery( {results, cols, className }: ImageGalleryProps ) {
     const {showList, setShowList, currentPage, setCurrentPage} = useIgnoreContext()
@@ -45,19 +48,60 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
     const pageCount = Math.ceil(results.length / itemsPerPage);
 
 
+    const [username, setUsername] = useState<string>("Unknown User");
+    useEffect(() => {
+        const storedUsername = localStorage.getItem("username");
+        if (storedUsername) {
+            setUsername(storedUsername);
+        }
+    }, []);
     const sendHiddenTitles = async () => {
         const hiddenTitles = results
             .filter((_, idx) => !showList[idx])
             .map(item => `${item.video_id}_${item.keyframe_id}`);
-
-        try {
-            console.log("hidden titles: ", hiddenTitles)
-            await axios.post("/api/hide-list", { hiddenTitles });
-            console.log("Đã gửi thành công!");
-        } catch (err) {
-            console.error("Lỗi khi gửi:", err);
-        }
+        console.log("hidden titles: ", hiddenTitles);
+        socket.emit("hiddenTitles", {
+            username,          // gửi thêm username
+            hiddenTitles       // và danh sách bị ẩn
+        });
     };
+
+    const [ignoredImage, setIgnoredImage] = useState<any[]>([]);
+    const [ignoredUsernames, setIgnoredUsernames] = useState<(string | null)[]>([]);
+    // Lắng nghe ignoredImage từ server
+    useEffect(() => {
+        socket.on("ignoredImage", (data: any[]) => {
+            setIgnoredImage(data);
+        });
+
+        return () => {
+        socket.off("ignoredImage");
+        };
+    }, []);
+
+    useEffect(() => {
+        // Lấy ra set chứa tất cả keyframe_id bị ẩn
+        const ignoredMap = new Map(
+            ignoredImage.map(item => [item.keyframe_id, item.username])
+        );
+
+        const newShowList: boolean[] = [];
+        const newIgnoredUsernames: (string | null)[] = [];
+
+        results.forEach(item => {
+            if (ignoredMap.has(item.keyframe_id)) {
+                newShowList.push(false);
+                newIgnoredUsernames.push(ignoredMap.get(item.keyframe_id) || null);
+            } else {
+                newShowList.push(true);
+                newIgnoredUsernames.push(null);
+            }
+        });
+
+        setShowList(newShowList);
+        setIgnoredUsernames(newIgnoredUsernames);
+    }, [results, ignoredImage]);
+
     return (
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
@@ -87,8 +131,18 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                                 onClick={() => toggleShow(globalIndex)}
                                 sx={{
                                     position: "absolute",
-                                    bottom: "5px",
-                                    right: "5px",
+                                    ...(showList[globalIndex]
+                                    ? {
+                                        bottom: "5px",
+                                        right: "5px",
+                                        p: "6px"
+                                        }
+                                    : {
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        }
+                                    ),
                                     p: "4px",
                                     backgroundColor: `${showList[globalIndex] ? "rgba(255, 255, 255, 0.5)" : "red"}`,
                                     "&:hover": {
@@ -99,9 +153,23 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                                 {showList[globalIndex] ? (
                                     <VisibilityIcon sx={{ color: "black", fontSize: 18 }} />
                                 ) : (
-                                    <VisibilityOffIcon sx={{ color: "black", fontSize: 18 }} />
+                                    <VisibilityOffIcon sx={{ color: "black", fontSize: 25 }} />
                                 )}
                             </IconButton>
+                            
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    top: "5px",
+                                    right: "5px",
+                                }}      
+                            >
+                                {
+                                    !showList[globalIndex] && ignoredUsernames[globalIndex] && (
+                                        <CustomAvatar name={ignoredUsernames[globalIndex] || "Unknown User"} />
+                                    )
+                                }
+                            </Box>
 
                             {/* Overlay icon Fullscreen */}
                             <IconButton

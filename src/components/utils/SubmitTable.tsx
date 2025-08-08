@@ -19,23 +19,23 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
     const {queryName} = useSearchContext()
 
     const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-    const items = Array.from(rows);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setRows(items);
+        if (!result.destination) return;
+        const items = Array.from(rows);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+        setRows(items);
     };
 
     const handleDelete = (index: number) => {
-    const updated = [...rows];
-    updated.splice(index, 1);
-    setRows(updated);
+        const updated = [...rows];
+        updated.splice(index, 1);
+        setRows(updated);
     };
 
     const handleEdit = (index: number, field: string, value: string) => {
-    const updated = [...rows];
-    updated[index][field] = value;
-    setRows(updated);
+        const updated = [...rows];
+        updated[index][field] = value;
+        setRows(updated);
     };
 
 

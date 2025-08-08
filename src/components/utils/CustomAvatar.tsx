@@ -31,7 +31,11 @@ function stringAvatar(name: string) {
   };
 }
 
-export default function CustomAvatar() {
+type CustomAvatarProps = {
+  name?: string;
+}
+
+export default function CustomAvatar({name}: CustomAvatarProps) {
   const [username, setUsername] = useState<string>("Unknown User");
   useEffect(() => {
       const storedUsername = localStorage.getItem("username");
@@ -40,7 +44,17 @@ export default function CustomAvatar() {
       }
   }, []);
   return (
-    <Avatar {...stringAvatar(String(username))} />
+    <Avatar {...stringAvatar(String(name ?? username))} 
+      sx={{
+        ...stringAvatar(String(name ?? username)).sx,
+        ...(name && {
+            width: 24,   // chiều rộng
+            height: 24,  // chiều cao
+            fontSize: 12 // kích thước chữ
+          }
+        ),
+      }}
+    />
   );
 }
 
