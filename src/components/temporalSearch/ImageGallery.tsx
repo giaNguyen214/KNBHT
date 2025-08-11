@@ -6,11 +6,13 @@ import {
     Dialog,
     Typography,
     Pagination,
-    Button
+    Button,
+    Checkbox
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { Item } from "@/types/Query";
 import { useState, useEffect } from "react";
@@ -18,15 +20,21 @@ import { ImageGalleryProps } from "@/types/Query";
 
 import { base_folder } from "@/constants/keyframe";
 import { itemsPerPage } from "@/constants/keyframe";
-import { useIgnoreContext } from "@/contexts/searchContext";
+import { useSearchContext, useIgnoreContext } from "@/contexts/searchContext";
+import { useIgnoreImageContext } from "@/contexts/ignoreContext";
 
-import axios from "axios";
 import CustomAvatar from "../utils/CustomAvatar";
 
 import socket from "@/lib/socket";
 
+type IgnoredItem = {
+  keyframe_id: string;
+  username: string;
+};
+
 export default function ImageGallery( {results, cols, className }: ImageGalleryProps ) {
     const {showList, setShowList, currentPage, setCurrentPage} = useIgnoreContext()
+    const {queryName} = useSearchContext()
     // const [showList, setShowList] = useState<boolean[]>([])
 
     // Khi results thay đổi, reset showList cho đúng số lượng item
@@ -47,6 +55,36 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
     const paginatedResults = results.slice(startIndex, startIndex + itemsPerPage);
     const pageCount = Math.ceil(results.length / itemsPerPage);
 
+    const [autoIgnore, setAutoIgnore] = useState(false);
+    const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
+    const handleAutoIgnoreChange = () => {
+        if (!autoIgnore) {
+            // Trường hợp đang OFF -> Bật ON
+            setPrevShowList(showList); // lưu trạng thái trước đó
+
+            // setShowList(Array(showList.length).fill(false)); // hide hết
+            // setShowList(Array(itemsPerPage).fill(true));
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            setShowList(prev =>
+                prev.map((val, i) => {
+                    if (i >= startIndex && i < endIndex) {
+                        return false; // hide ảnh trong trang hiện tại
+                    }
+                    return val; // giữ nguyên các trang khác
+                })
+            );
+
+            setAutoIgnore(true);
+        } else {
+            // Trường hợp đang ON -> Tắt OFF
+            if (prevShowList.length > 0) {
+                setShowList(prevShowList); // khôi phục trạng thái cũ
+            }
+            setAutoIgnore(false);
+        }
+    };
 
     const [username, setUsername] = useState<string>("Unknown User");
     useEffect(() => {
@@ -55,53 +93,63 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
             setUsername(storedUsername);
         }
     }, []);
+    // socket config
     const sendHiddenTitles = async () => {
         const hiddenTitles = results
             .filter((_, idx) => !showList[idx])
-            .map(item => `${item.video_id}_${item.keyframe_id}`);
+            .map(item => `${item.keyframe_id}`);
+        console.log("Đã gửi ignored image")
         console.log("hidden titles: ", hiddenTitles);
         socket.emit("hiddenTitles", {
             username,          // gửi thêm username
+            query_name: queryName,
             hiddenTitles       // và danh sách bị ẩn
         });
     };
+    
 
-    const [ignoredImage, setIgnoredImage] = useState<any[]>([]);
-    const [ignoredUsernames, setIgnoredUsernames] = useState<(string | null)[]>([]);
-    // Lắng nghe ignoredImage từ server
+    const {ignoredMap, setIgnoredMap, ignoredUsernames, setIgnoredUsernames} = useIgnoreImageContext()
+
+
     useEffect(() => {
-        socket.on("ignoredImage", (data: any[]) => {
-            setIgnoredImage(data);
+        socket.on("ignoredImage", (newIgnored: { keyframe_id: string; username: string; query_name: string }[]) => {
+            setIgnoredMap((prev) => {
+            const updated = new Map(prev);
+            newIgnored.forEach(({ keyframe_id, username, query_name }) => {
+                if (!updated.has(query_name)) {
+                updated.set(query_name, new Map());
+                }
+                updated.get(query_name)!.set(keyframe_id, username);
+            });
+            return updated;
+            });
         });
 
         return () => {
-        socket.off("ignoredImage");
+            socket.off("ignoredImage");
         };
     }, []);
 
     useEffect(() => {
-        // Lấy ra set chứa tất cả keyframe_id bị ẩn
-        const ignoredMap = new Map(
-            ignoredImage.map(item => [item.keyframe_id, item.username])
-        );
+        const currentIgnored = ignoredMap.get(queryName) || new Map();
 
         const newShowList: boolean[] = [];
         const newIgnoredUsernames: (string | null)[] = [];
 
         results.forEach(item => {
-            if (ignoredMap.has(item.keyframe_id)) {
-                newShowList.push(false);
-                newIgnoredUsernames.push(ignoredMap.get(item.keyframe_id) || null);
+            if (currentIgnored.has(item.keyframe_id)) {
+            newShowList.push(false);
+            newIgnoredUsernames.push(currentIgnored.get(item.keyframe_id) || null);
             } else {
-                newShowList.push(true);
-                newIgnoredUsernames.push(null);
+            newShowList.push(true);
+            newIgnoredUsernames.push(null);
             }
         });
 
         setShowList(newShowList);
         setIgnoredUsernames(newIgnoredUsernames);
-    }, [results, ignoredImage]);
-
+    }, [results, ignoredMap]);
+   
     return (
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
@@ -109,14 +157,8 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     const globalIndex = startIndex + index; // dùng để index vào showList
                     // console.log("Render item", globalIndex);
 
-                    let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
-                    if (process.env.NEXT_PUBLIC_MODE === "test") {
-                        imgSrc = `${base_folder}/${item.video_id}_${item.keyframe_id}.${item.timestamp}s.jpg`;
-                    }
-
-
-                    // console.log("img source", imgSrc)
-                    const imgTitle = `${item.video_id}_${item.keyframe_id}`;
+                    const imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
+                    const imgTitle = `${item.keyframe_id}`;
                     return (
                         <ImageListItem key={globalIndex} className="relative">
                             <img
@@ -214,6 +256,32 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     onChange={(e, page) => setCurrentPage(page)}
                     variant="outlined" 
                     shape="rounded" 
+                />
+
+                <FormControlLabel
+                    label={`Ignore all page ${currentPage}`}
+                    labelPlacement="top"
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "column", // 👈 label trên, checkbox dưới
+                        textAlign: "center",
+                        m: 1
+                    }}
+                    slotProps={{
+                        typography: {
+                            fontFamily: "monospace",
+                            fontSize: "15px",
+                            color:'green'
+                        }
+                    }}
+                    control={
+                        <Checkbox
+                            checked={autoIgnore}
+                            onChange={handleAutoIgnoreChange}
+                            color="success"
+                        />
+                    }
                 />
 
                 <Button 

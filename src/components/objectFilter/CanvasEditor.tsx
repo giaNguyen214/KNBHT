@@ -56,9 +56,9 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
     
     return (
         <Box className="w-full h-full">
-            <Box className="w-full h-full flex justify-center items-center gap-x-5">
+            <Box className="w-full h-full flex justify-center items-center gap-10">
                 <Box className="h-[95vh] flex flex-col">
-                    <Box className="w-[70vw] h-full bg-white border border-[#ccc] relative
+                    <Box className="max-w-[60vw] h-full aspect-video bg-white border border-[#ccc] relative
                         [background-image:linear-gradient(to_right,_#eee_1px,_transparent_1px),_linear-gradient(to_bottom,_#eee_1px,_transparent_1px)]
                         [background-size:20px_20px] flex-1"
                     >
@@ -146,7 +146,7 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                         })}
                     </Box>
 
-                    <Box>
+                    {/* <Box>
                         <Typography 
                             variant="caption" 
                             sx={{ fontSize: "11px", marginBottom: "4px" }}
@@ -177,13 +177,13 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                             ))}
                             </TableBody>
                         </Table>
-                    </Box>
+                    </Box> */}
 
                 </Box>
                 <Box className="w-[15%]">
                     {
                         openColorPicker && (
-                            <ColorPalettePicker color={color} setColor={setColor}/>
+                            <ColorPalettePicker color={color} setColor={setColor} shapesOnCanvas={shapesOnCanvas}/>
                         )
                     }
                 </Box>

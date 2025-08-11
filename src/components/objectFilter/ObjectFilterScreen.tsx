@@ -117,7 +117,7 @@ export default function ObjectFilterScreen() {
   }, []);
 
   return (
-    <Box className="w-full h-full flex justify-center items-center gap-2">
+    <Box className="w-full h-full flex justify-center items-center">
       {/* Sidebar: List shape */}
       <ObjectList 
         objects={defaultShapes} 

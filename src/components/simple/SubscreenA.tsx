@@ -23,6 +23,8 @@ import axios from "axios";
 import { itemsPerPage } from "@/constants/keyframe";
 
 import ResultModal from "../utils/SubmitTable";
+import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
+
 
 export default function SubscreenA() {
     const { query, mode, topK } = useSearchContext();
@@ -45,6 +47,10 @@ export default function SubscreenA() {
             return { valid: false, severity: "warning" as const, message: "Cần nhập câu truy vấn trước" };
         }
 
+        if (queryName.trim() === "") {
+            return { valid: false, severity: "warning" as const, message: "Chọn query name trước" };
+        }
+
         const noFilters =
             objectFilters.length === 0 &&
             colors.length === 0 &&
@@ -58,6 +64,7 @@ export default function SubscreenA() {
         return { valid: true } as const;
     };
 
+    const { fetchIgnoredImages } = useFetchIgnoredImages();
     const onFilterClick = () => {
         const result = validateFilters();
 
@@ -79,10 +86,12 @@ export default function SubscreenA() {
             asr_query: asrQuery,
             top_k: topK_value
         });
+
+        fetchIgnoredImages(queryName)
     };
 
-    const [autoIgnore, setAutoIgnore] = useState(false);
-    const {showList, setShowList,  currentPage, setCurrentPage} = useIgnoreContext()
+    // const [autoIgnore, setAutoIgnore] = useState(false);
+    // const {showList, setShowList,  currentPage, setCurrentPage} = useIgnoreContext()
     const {results} = useSearchResultContext()
     // const sendHiddenTitles = async () => {
     //     const hiddenTitles = results
@@ -98,35 +107,35 @@ export default function SubscreenA() {
     //     }
     // };
 
-    const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
-    const handleAutoIgnoreChange = () => {
-        if (!autoIgnore) {
-            // Trường hợp đang OFF -> Bật ON
-            setPrevShowList(showList); // lưu trạng thái trước đó
+    // const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
+    // const handleAutoIgnoreChange = () => {
+    //     if (!autoIgnore) {
+    //         // Trường hợp đang OFF -> Bật ON
+    //         setPrevShowList(showList); // lưu trạng thái trước đó
 
-            // setShowList(Array(showList.length).fill(false)); // hide hết
-            // setShowList(Array(itemsPerPage).fill(true));
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
+    //         // setShowList(Array(showList.length).fill(false)); // hide hết
+    //         // setShowList(Array(itemsPerPage).fill(true));
+    //         const startIndex = (currentPage - 1) * itemsPerPage;
+    //         const endIndex = startIndex + itemsPerPage;
 
-            setShowList(prev =>
-                prev.map((val, i) => {
-                    if (i >= startIndex && i < endIndex) {
-                        return false; // hide ảnh trong trang hiện tại
-                    }
-                    return val; // giữ nguyên các trang khác
-                })
-            );
+    //         setShowList(prev =>
+    //             prev.map((val, i) => {
+    //                 if (i >= startIndex && i < endIndex) {
+    //                     return false; // hide ảnh trong trang hiện tại
+    //                 }
+    //                 return val; // giữ nguyên các trang khác
+    //             })
+    //         );
 
-            setAutoIgnore(true);
-        } else {
-            // Trường hợp đang ON -> Tắt OFF
-            if (prevShowList.length > 0) {
-                setShowList(prevShowList); // khôi phục trạng thái cũ
-            }
-            setAutoIgnore(false);
-        }
-    };
+    //         setAutoIgnore(true);
+    //     } else {
+    //         // Trường hợp đang ON -> Tắt OFF
+    //         if (prevShowList.length > 0) {
+    //             setShowList(prevShowList); // khôi phục trạng thái cũ
+    //         }
+    //         setAutoIgnore(false);
+    //     }
+    // };
 
     const [colors, setColors] = useState<string[]>([]);
     const [currentColor, setCurrentColor] = useState("#000000");
@@ -227,7 +236,7 @@ export default function SubscreenA() {
 
 
                 <Box className="flex justify-center items-center gap-10">
-                    <Box className="flex justify-center items-center gap-2 border p-2">
+                    {/* <Box className="flex justify-center items-center gap-2 border p-2">
                         <FormControlLabel
                             label="Auto Ignore"
                             slotProps={{
@@ -246,7 +255,7 @@ export default function SubscreenA() {
                             }
                         />
 
-                    </Box>
+                    </Box> */}
 
                     <Button variant="contained" onClick={onFilterClick}>
                         {searching ? "filtering..." : "Filter"}

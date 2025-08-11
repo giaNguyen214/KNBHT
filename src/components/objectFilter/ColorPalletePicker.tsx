@@ -8,7 +8,11 @@ import {
   TextField, 
   Typography,
   Autocomplete,
-  IconButton
+  IconButton,
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableRow
 } from "@mui/material";
 import { ColorPalletePickerProps } from "@/types/Color";
 import { cssColorNames } from "@/constants/color";
@@ -30,7 +34,7 @@ function getContrastColor(bgColor: string) {
 }
 
 
-export default function ColorPalettePicker({color, setColor}: ColorPalletePickerProps) {
+export default function ColorPalettePicker({color, setColor, shapesOnCanvas}: ColorPalletePickerProps) {
   const [colorNameInput, setColorNameInput] = useState("");
   const [hexInput, setHexInput] = useState("");
 
@@ -78,6 +82,9 @@ export default function ColorPalettePicker({color, setColor}: ColorPalletePicker
     }
   };
 
+  const fields = ["name", "x_min", "x_max", "y_min", "y_max", "color"] as const;
+  type Field = typeof fields[number];
+  
   return (
     <Box className="h-full w-full flex flex-col justify-center items-center gap-5">
       <Box className="w-full grid grid-cols-5 gap-2">
@@ -158,6 +165,43 @@ export default function ColorPalettePicker({color, setColor}: ColorPalletePicker
       >
           Selected {color}
       </Typography>
+
+      <Box>
+          <Typography 
+              variant="caption" 
+              sx={{ fontSize: "11px", marginBottom: "4px" }}
+          >
+              Tổng số object: {shapesOnCanvas.length}
+          </Typography>
+          <Box className="max-w-[250px] overflow-y-auto">
+          <Table size="small">
+              <TableBody>
+                {fields.map((field) => (
+                    <TableRow key={field}>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{ fontWeight: "bold", fontSize: "10px", padding: "2px 4px" }}
+                    >
+                        {field}
+                    </TableCell>
+                      {shapesOnCanvas.map((shape, idx) => (
+                          <TableCell 
+                          key={idx} 
+                          sx={{ fontSize: "10px", padding: "2px 4px" }}
+                          >
+                            {["x_min", "x_max", "y_min", "y_max"].includes(field)
+                            ? Math.round(Number(shape[field]))
+                            : shape[field]}
+
+                          </TableCell>
+                      ))}
+                    </TableRow>
+                ))}
+              </TableBody>
+          </Table>
+          </Box>
+      </Box>
     </Box>
   );
 }

@@ -25,10 +25,11 @@ import MenuItem from '@mui/material/MenuItem';
 import ResultModal from "../utils/SubmitTable";
 
 import { itemsPerPage } from "@/constants/keyframe";
-import axios from "axios";
+import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
 
 export default function SubscreenC() {
-    const [autoIgnore, setAutoIgnore] = useState(false);
+    // const [autoIgnore, setAutoIgnore] = useState(false);
+    
     const {query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK} = useSearchContext();
     const {searching, handleSearch, cols, setCols} = useSearchResultContext()
 
@@ -39,10 +40,19 @@ export default function SubscreenC() {
         setIsOpen(false)
     }
 
+    // Gọi hàm này khi cần load ignore ban đầu cho 1 query_name
+    const { fetchIgnoredImages } = useFetchIgnoredImages();
     const onSearchClick = () => {
         if (query.trim() === "") {
             setPopupSeverity("warning");
             setPopupMessage("Cần nhập câu truy vấn trước");
+            setIsOpen(true);
+            return;
+        }
+
+        if (queryName.trim() === "") {
+            setPopupSeverity("warning");
+            setPopupMessage("Chọn query name trước");
             setIsOpen(true);
             return;
         }
@@ -58,6 +68,8 @@ export default function SubscreenC() {
             asr_query: "",
             top_k: topK_value
         });
+
+        fetchIgnoredImages(queryName)
     };
 
     const [username, setUsername] = useState<string>("Unknown User");
@@ -79,61 +91,62 @@ export default function SubscreenC() {
 
     const isDifferent = dataSource !== username;
 
-    const {showList, setShowList, currentPage, setCurrentPage} = useIgnoreContext()
+    // const {showList, setShowList, currentPage, setCurrentPage} = useIgnoreContext()
+    
     const {results} = useSearchResultContext()
-    const sendHiddenTitles = async () => {
-        const hiddenTitles = results
-            .filter((_, idx) => !showList[idx])
-            .map(item => `${item.video_id}_${item.keyframe_id}`);
+    // const sendHiddenTitles = async () => {
+    //     const hiddenTitles = results
+    //         .filter((_, idx) => !showList[idx])
+    //         .map(item => `${item.video_id}_${item.keyframe_id}`);
 
-        if (queryName === "") {
-            alert("Phải chọn Query Name")
-            return
-        }
-        if (hiddenTitles.length === 0) {
-            alert("Chọn ảnh để ignore")
-            return
-        }
+    //     if (queryName === "") {
+    //         alert("Phải chọn Query Name")
+    //         return
+    //     }
+    //     if (hiddenTitles.length === 0) {
+    //         alert("Chọn ảnh để ignore")
+    //         return
+    //     }
 
-        try {
-            console.log("hidden titles: ", hiddenTitles)
-            console.log("query name", queryName)
-            await axios.post("/api/hide-list", { hiddenTitles });
-            console.log("Đã gửi thành công!");
-        } catch (err) {
-            console.error("Lỗi khi gửi:", err);
-        }
-    };
+    //     try {
+    //         console.log("hidden titles: ", hiddenTitles)
+    //         console.log("query name", queryName)
+    //         await axios.post("/api/hide-list", { hiddenTitles });
+    //         console.log("Đã gửi thành công!");
+    //     } catch (err) {
+    //         console.error("Lỗi khi gửi:", err);
+    //     }
+    // };
 
-    const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
-    const handleAutoIgnoreChange = () => {
-        if (!autoIgnore) {
-            // Trường hợp đang OFF -> Bật ON
-            setPrevShowList(showList); // lưu trạng thái trước đó
+    // const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
+    // const handleAutoIgnoreChange = () => {
+    //     if (!autoIgnore) {
+    //         // Trường hợp đang OFF -> Bật ON
+    //         setPrevShowList(showList); // lưu trạng thái trước đó
 
-            // setShowList(Array(showList.length).fill(false)); // hide hết
-            // setShowList(Array(itemsPerPage).fill(true));
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
+    //         // setShowList(Array(showList.length).fill(false)); // hide hết
+    //         // setShowList(Array(itemsPerPage).fill(true));
+    //         const startIndex = (currentPage - 1) * itemsPerPage;
+    //         const endIndex = startIndex + itemsPerPage;
 
-            setShowList(prev =>
-                prev.map((val, i) => {
-                    if (i >= startIndex && i < endIndex) {
-                        return false; // hide ảnh trong trang hiện tại
-                    }
-                    return val; // giữ nguyên các trang khác
-                })
-            );
+    //         setShowList(prev =>
+    //             prev.map((val, i) => {
+    //                 if (i >= startIndex && i < endIndex) {
+    //                     return false; // hide ảnh trong trang hiện tại
+    //                 }
+    //                 return val; // giữ nguyên các trang khác
+    //             })
+    //         );
 
-            setAutoIgnore(true);
-        } else {
-            // Trường hợp đang ON -> Tắt OFF
-            if (prevShowList.length > 0) {
-                setShowList(prevShowList); // khôi phục trạng thái cũ
-            }
-            setAutoIgnore(false);
-        }
-    };
+    //         setAutoIgnore(true);
+    //     } else {
+    //         // Trường hợp đang ON -> Tắt OFF
+    //         if (prevShowList.length > 0) {
+    //             setShowList(prevShowList); // khôi phục trạng thái cũ
+    //         }
+    //         setAutoIgnore(false);
+    //     }
+    // };
 
 
     const [submit, setSubmit] = useState(false)
@@ -229,8 +242,8 @@ export default function SubscreenC() {
                 </Box>
                 <Box className="flex-1 w-full mt-2 flex justify-around items-center">
                     {/* Ignore */}
-                    <Box className="flex justify-center items-center gap-2 border p-2">
-                        <FormControlLabel
+                    {/* <Box className="flex justify-center items-center gap-2 border p-2"> */}
+                        {/* <FormControlLabel
                             label="Auto Ignore"
                             labelPlacement="top"
                             sx={{
@@ -254,7 +267,7 @@ export default function SubscreenC() {
                                     color="success"
                                 />
                             }
-                        />
+                        /> */}
                         
                         <Box sx={{ minWidth: 110 }}>
                             <FormControl fullWidth>
@@ -286,7 +299,7 @@ export default function SubscreenC() {
                                     ))}
                                 </Select>
                             </FormControl>
-                        </Box>
+                        {/* </Box> */}
 
                         {/* <Button 
                             variant="contained" 

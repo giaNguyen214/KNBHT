@@ -12,13 +12,14 @@ import Login from "@/components/utils/Login"
 import { IgnoreProvider, SearchProvider, SearchResultProvider } from "@/contexts/searchContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import Sidebar from "@/components/temporalSearch/Siderbar"
-
+import { IgnoreImageProvider } from "@/contexts/ignoreContext"
 
 export default function Simple() {    
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     return (
         <SearchProvider>
+        <IgnoreImageProvider>
             <Sidebar open={drawerOpen} setOpen={setDrawerOpen}/>
             <Box className="w-screen h-screen grid grid-cols-[1fr_2fr] gap-2">
                 <IgnoreProvider>
@@ -39,7 +40,8 @@ export default function Simple() {
                     </Box>
                 </IgnoreProvider>
             </Box>
-         </SearchProvider>
+        </IgnoreImageProvider>
+        </SearchProvider>
     )
 }
 

@@ -41,5 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 # keyframes
-/public/assets/keyframes/
+/public/assets/
 src/itemData.json
