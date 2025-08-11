@@ -6,7 +6,7 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
     const payload = {
         text_query: searchPayload.text_query,
         mode: "hybrid",
-        object_filters: searchPayload.object_filters || [],
+        object_filters: {},
         color_filters: searchPayload.color_filters || [],
         ocr_query: searchPayload.ocr_query,
         asr_query: searchPayload.asr_query,
@@ -29,7 +29,7 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
         return response.data
     }
 
-
+    console.log("payload", payload)
     const response = await axiosClient.post(API_CONFIG.ENDPOINTS.SEARCH.SIMPLE, payload)
     return response.data
 }

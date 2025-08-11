@@ -157,7 +157,13 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     const globalIndex = startIndex + index; // dùng để index vào showList
                     // console.log("Render item", globalIndex);
 
-                    const imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
+                    let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
+                    if (process.env.NEXT_PUBLIC_MODE !== "test") {
+                        const [l, _, v] = item.video_id.split("_"); // destructuring, bỏ phần giữa
+                        console.log("l, v", l, v)
+                        imgSrc = `${base_folder}/${l}/${v}/${item.keyframe_id}`; // mặc định
+                    }
+
                     const imgTitle = `${item.keyframe_id}`;
                     return (
                         <ImageListItem key={globalIndex} className="relative">
