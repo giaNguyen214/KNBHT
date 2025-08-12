@@ -11,7 +11,7 @@ export default function Test() {
         <ObjectProvider>
             <Box className="h-screen w-screen flex justify-center items-center">
                 <Box className="h-[80vh] w-full flex justify-center items-center p-5">
-                    <ObjectFilterScreen/>
+                    {/* <ObjectFilterScreen/> */}
                 </Box>
             </Box>
         </ObjectProvider>

@@ -20,8 +20,15 @@ const getRandomSize = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export default function ObjectFilterScreen() {
-  const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
+
+type ObjectFilterScreenProps = {
+  shapesOnCanvas: CustomObject[];
+  setShapesOnCanvas: React.Dispatch<React.SetStateAction<CustomObject[]>>;
+};
+
+
+export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}: ObjectFilterScreenProps) {
+  // const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
 
   const handleAddShape = (shapeTemplate: any) => {
     const x = 50;
@@ -38,7 +45,7 @@ export default function ObjectFilterScreen() {
       color: shapeTemplate.color,
     };
     setShapesOnCanvas([...shapesOnCanvas, newShape]);
-    console.log("shapeTemplate", shapeTemplate)
+    // console.log("shapeTemplate", shapeTemplate)
   };
 
   const handleDragStop = (

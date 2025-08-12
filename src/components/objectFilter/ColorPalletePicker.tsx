@@ -86,7 +86,7 @@ export default function ColorPalettePicker({color, setColor, shapesOnCanvas}: Co
   type Field = typeof fields[number];
   
   return (
-    <Box className="h-full w-full flex flex-col justify-center items-center gap-5">
+    <Box className="h-[85vh] w-full flex flex-col justify-center items-center gap-5">
       <Box className="w-full grid grid-cols-5 gap-2">
         {presetColors.map((preset) => (
           <Box

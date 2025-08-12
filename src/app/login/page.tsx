@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, CircularProgress, TextField, Typography, Button } from "@mui/material";
+import { Box, CircularProgress, TextField, Typography, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio  } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -48,25 +48,30 @@ export default function LoginPage() {
                 <Typography sx={{ fontFamily: "monospace" }} variant="h6" align="center">
                     Login
                 </Typography>
-                <TextField
-                    label="Username"
-                    variant="filled"
-                    value={username}
-                    onChange={(e) => {
+                
+                <FormControl component="fieldset" fullWidth>
+                    <RadioGroup
+                        value={username}
+                        onChange={(e) => {
                         setUsername(e.target.value);
                         if (error) {
                             setError(false);
                             setMessage("");
                         }
-                    }}
-                    size="small"
-                    fullWidth
-                    error={error}
-                    helperText={error ? message : ""}
-                    slotProps={{
-                        input: { className: "font-mono" }
-                    }}
-                />
+                        }}
+                    >
+                        {["Gia Nguyên", "Duy Bảo", "Duy Khương", "Minh Tâm", "Lê Hiếu"].map((name) => (
+                            <FormControlLabel
+                                key={name}
+                                value={name}
+                                control={<Radio />}
+                                label={name}
+                            />
+                        ))}
+                    </RadioGroup>
+                    {error && <p style={{ color: "red", fontSize: "0.8rem" }}>{message}</p>}
+                </FormControl>
+
                 <Button variant="contained" onClick={handleLogin}>
                     Đăng nhập
                 </Button>

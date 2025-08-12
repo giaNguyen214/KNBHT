@@ -7,14 +7,14 @@ const socket = io(socket_url, {
 });
 
 
-// Lắng nghe event connect
-socket.on("connect", () => {
-  console.log("✅ Socket connected:", socket.id);
-});
+// // Lắng nghe event connect
+// socket.on("connect", () => {
+//   console.log("✅ Socket connected:", socket.id);
+// });
 
-// Lắng nghe event disconnect
-socket.on("disconnect", (reason) => {
-  console.log("❌ Socket disconnected:", reason);
-});
+// // Lắng nghe event disconnect
+// socket.on("disconnect", (reason) => {
+//   console.log("❌ Socket disconnected:", reason);
+// });
 
 export default socket;

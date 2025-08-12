@@ -5,7 +5,8 @@ import {
     Button,
     TextField,
     Typography,
-    Checkbox
+    Checkbox,
+    Slider
 } from "@mui/material"
 import * as React from 'react';
 import Radio from '@mui/material/Radio';
@@ -26,6 +27,8 @@ import ResultModal from "../utils/SubmitTable";
 
 import { itemsPerPage } from "@/constants/keyframe";
 import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
+
+
 
 export default function SubscreenC() {
     // const [autoIgnore, setAutoIgnore] = useState(false);
@@ -57,16 +60,16 @@ export default function SubscreenC() {
             return;
         }
 
-        const topK_value = topK === "" ? 100 : Number(topK);
+        // const topK_value = topK === "" ? 100 : Number(topK);
 
         handleSearch({
             text_query: query,
             mode: mode,
-            object_filters: [],
+            object_filters: {},
             color_filters: [],
             ocr_query: "",
             asr_query: "",
-            top_k: topK_value
+            top_k: topK
         });
 
         fetchIgnoredImages(queryName)
@@ -212,12 +215,12 @@ export default function SubscreenC() {
                                 <MenuItem value={"Lê Hiếu"}>Hiếu</MenuItem>
                                 <MenuItem value={"Duy Khương"}>Khương</MenuItem>
                                 <MenuItem value={"Duy Bảo"}>Bảo</MenuItem>
-                                <MenuItem value={"all"}>Full database</MenuItem>
+                                {/* <MenuItem value={"all"}>Full database</MenuItem> */}
                             </Select>
                         </FormControl>
                     </Box>
                     
-                    <TextField
+                    {/* <TextField
                         label="Top K"
                         type="number"
                         variant="outlined"
@@ -236,7 +239,21 @@ export default function SubscreenC() {
                             },
                         }}
                         size="small"
+                    /> */}
+
+                    <Box className="flex flex-col">
+                        <Typography gutterBottom className="text-center">Top K: {topK}</Typography>
+                    <Slider
+                    value={topK}
+                    onChange={(e, val) => setTopK(val)}
+                    valueLabelDisplay="auto"
+                    step={50}
+                    min={50}
+                    max={1000}
+                    sx={{ width: 200 }} // chỉnh độ dài thanh
                     />
+                    </Box>
+
 
                     <CustomAvatar/>
                 </Box>

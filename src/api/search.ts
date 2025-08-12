@@ -6,7 +6,7 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
     const payload = {
         text_query: searchPayload.text_query,
         mode: "hybrid",
-        object_filters: {},
+        object_filters: searchPayload.object_filters || {},
         color_filters: searchPayload.color_filters || [],
         ocr_query: searchPayload.ocr_query,
         asr_query: searchPayload.asr_query,

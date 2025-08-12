@@ -13,6 +13,7 @@ import { IgnoreProvider, SearchProvider, SearchResultProvider } from "@/contexts
 import CircularProgress from "@mui/material/CircularProgress";
 import Sidebar from "@/components/temporalSearch/Siderbar"
 import { IgnoreImageProvider } from "@/contexts/ignoreContext"
+import { ObjectProvider } from "@/contexts/objectContext"
 
 export default function Simple() {    
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -22,6 +23,7 @@ export default function Simple() {
         <IgnoreImageProvider>
             <Sidebar open={drawerOpen} setOpen={setDrawerOpen}/>
             <Box className="w-screen h-screen grid grid-cols-[1fr_2fr] gap-2">
+                {/* <ObjectProvider> */}
                 <IgnoreProvider>
                     <Box className="w-full h-full p-2 grid grid-rows-[1fr_2fr] gap-1 min-h-0">
                         <SearchResultProvider>
@@ -30,6 +32,7 @@ export default function Simple() {
                         </SearchResultProvider>
                     </Box>
                 </IgnoreProvider>
+                {/* </ObjectProvider> */}
 
                 <IgnoreProvider>
                     <Box className="w-full h-full p-2 grid grid-rows-[1fr_4fr] gap-1 min-h-0">

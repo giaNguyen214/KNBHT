@@ -12,7 +12,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState("clip");
   const [queryName, setQueryName] = useState("")
-  const [topK, setTopK] = useState<number | "">("")
+  const [topK, setTopK] = useState<number>(50)
 
   const [dataSource, setDataSource] = useState("");
   // Lấy localStorage khi chạy ở client
