@@ -70,8 +70,8 @@ export default function DynamicQuery({
     handleSearch({
       text_query: "query",
       mode: "mode",
-      object_filters: {},
-      color_filters: {},
+      object_filters: Record<string, [number, number, number][]>,
+      color_filters: Record<string, [number, number, number][]>,
       ocr_query: "",
       asr_query: "",
       top_k: 10
