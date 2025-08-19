@@ -150,6 +150,15 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
         setIgnoredUsernames(newIgnoredUsernames);
     }, [results, ignoredMap]);
    
+    // Hàm tách ra "L26"
+    function getFirstPart(name) {
+        return name.split("_")[0];
+    }
+
+    // Hàm tách ra "L26_V261"
+    function getFirstTwoParts(name) {
+        return name.split("_").slice(0, 2).join("_");
+    }
     return (
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
@@ -157,12 +166,14 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     const globalIndex = startIndex + index; // dùng để index vào showList
                     // console.log("Render item", globalIndex);
 
-                    let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
-                    if (process.env.NEXT_PUBLIC_MODE !== "test") {
-                        const [l, _, v] = item.video_id.split("_"); // destructuring, bỏ phần giữa
-                        // console.log("l, v", l, v)
-                        imgSrc = `${base_folder}/${l}/${v}/${item.keyframe_id}`; // mặc định
-                    }
+                    // let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
+                    // if (process.env.NEXT_PUBLIC_MODE !== "test") {
+                    //     const [l, _, v] = item.video_id.split("_"); // destructuring, bỏ phần giữa
+                    //     // console.log("l, v", l, v)
+                    //     imgSrc = `${base_folder}/${l}/${v}/${item.keyframe_id}`; // mặc định
+                    // }
+                    const filename = item.keyframe_id
+                    let imgSrc = `${base_folder}/${getFirstPart(filename)}/${getFirstTwoParts(filename)}/${filename}`; // mặc định
 
                     const imgTitle = `${item.keyframe_id}`;
                     return (
