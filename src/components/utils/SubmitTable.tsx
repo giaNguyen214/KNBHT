@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Box, Button, Typography, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import Papa from "papaparse";
 import { useSearchContext } from "@/contexts/searchContext";
+import { useIgnoreImageContext } from "@/contexts/ignoreContext";
+import {fps} from "@/constants/fps"
 
 interface ResultModalProps {
   submit: boolean; // Khi true thì hiển thị modal
@@ -12,19 +13,29 @@ interface ResultModalProps {
   mode: string
 }
 
+// helpers (đặt bên trong file component, phía trên export default)
+const KEYFRAME_RE = /^(L\d+_V\d{3})_(\d+(?:\.\d+)?)s\.jpg$/;
+
+function parseKeyframeId(keyframe_id: string) {
+  const m = keyframe_id.match(KEYFRAME_RE);
+  if (!m) return { video_id: "", timestamp: NaN };
+  const video_id = m[1];               // L29_V005
+  const timestamp = Number(m[2]);      // 113.96
+  return { video_id, timestamp };
+}
+
+function getFpsForVideo(video_id: string): number | null {
+  // Ưu tiên key có đuôi .mp4, nếu không có thì thử không đuôi
+  if (fps[`${video_id}.mp4`] !== undefined) return fps[`${video_id}.mp4`];
+  if (fps[video_id] !== undefined) return fps[video_id];
+  return null;
+}
+
 
 export default function ResultModal({ submit, closeSubmitModal, results, mode }: ResultModalProps) {
     const [rows, setRows] = useState(results);
-
+    const {showList, setShowList} = useIgnoreImageContext()
     const {queryName} = useSearchContext()
-
-    const handleDragEnd = (result: DropResult) => {
-        if (!result.destination) return;
-        const items = Array.from(rows);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        setRows(items);
-    };
 
     const handleDelete = (index: number) => {
         const updated = [...rows];
@@ -40,24 +51,39 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
 
 
     // Tải CSV
-    const downloadCSV = () => {
-        const safeRows = rows.map(row => [
-            `="${row.video_id}"`,
-            `="${row.keyframe_id}"`,
-            `="${row.timestamp}"`
-        ]);
+    const downloadFrameTxt = () => {
+        // Lấy 100 dòng đầu
+        const first100 = derivedRows.slice(0, 100);
 
-        const csv = Papa.unparse(safeRows, { header: false, quotes: false });
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        // Mỗi dòng dạng "video_id,frame_id"
+        const lines = first100.map(r => `${r.video_id},${r.frame_id ?? ""}`);
+
+        const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", `${queryName}.csv`);
+        link.setAttribute("download", `${queryName}_frames.txt`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    };
+        };
 
+
+    // ngay trong component, trước phần return
+    const derivedRows = rows
+    .filter((_, idx) => showList[idx])
+    .map((item) => {
+        const { video_id, timestamp } = parseKeyframeId(item.keyframe_id || "");
+        const fpsVal = getFpsForVideo(video_id);
+        const frame_id =
+            Number.isFinite(timestamp) && fpsVal != null ? Math.round(timestamp * fpsVal) : null;
+        return {
+            video_id,
+            timestamp,                // số giây (number)
+            fps: fpsVal,              // giữ số chính xác từ map fps
+            frame_id
+        };
+    });
 
     return (
         submit && (
@@ -100,87 +126,44 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
                         Query {queryName}
                     </Typography>
 
-                    <Button variant="contained" onClick={downloadCSV}>
+                    <Button variant="contained" onClick={downloadFrameTxt}>
                         Tải xuống
                     </Button>
                 </Box>
 
                 <Box className="h-[80vh] overflow-auto">
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                        <Droppable droppableId="table">
-                        {(provided) => (
-                            <Box
-                            component="table"
-                            sx={{ width: "100%", borderCollapse: "collapse" }}
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            >
-                            <thead>
-                                <tr>
-                                <th>#</th>
-                                <th>Video ID</th>
-                                <th>Keyframe ID</th>
-                                <th>Timestamp</th>
-                                <th>Xóa</th>
+                    <Box component="table" sx={{ width: "100%", borderCollapse: "collapse" }}>
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Video ID</th>
+                            <th>Timestamp (s)</th>
+                            <th>FPS</th>
+                            <th>Frame ID</th>
+                            <th>Xóa</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {derivedRows.map((row, index) => (
+                                <tr key={index}>
+                                    <td style={{ textAlign: "center" }}>{index + 1}</td>
+                                    <td style={{ textAlign: "center" }}>{row.video_id}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                    {Number.isFinite(row.timestamp) ? row.timestamp : ""}
+                                    </td>
+                                    <td style={{ textAlign: "center" }}>{row.fps ?? ""}</td>
+                                    <td style={{ textAlign: "center" }}>{row.frame_id ?? ""}</td>
+                                    <td style={{ textAlign: "center" }}>
+                                    <IconButton onClick={() => handleDelete(index)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {rows.map((item, index) => (
-                                <Draggable
-                                    key={index}
-                                    draggableId={String(index)}
-                                    index={index}
-                                >
-                                    {(provided) => (
-                                    <tr
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                    >
-                                        <td>{index + 1}</td>
-                                        <td>
-                                        <TextField
-                                            size="small"
-                                            value={item.video_id}
-                                            onChange={(e) =>
-                                            handleEdit(index, "video_id", e.target.value)
-                                            }
-                                        />
-                                        </td>
-                                        <td>
-                                        <TextField
-                                            size="small"
-                                            value={item.keyframe_id}
-                                            onChange={(e) =>
-                                            handleEdit(index, "keyframe_id", e.target.value)
-                                            }
-                                        />
-                                        </td>
-                                        <td>
-                                        <TextField
-                                            size="small"
-                                            value={item.timestamp}
-                                            onChange={(e) =>
-                                            handleEdit(index, "timestamp", e.target.value)
-                                            }
-                                        />
-                                        </td>
-                                        <td>
-                                        <IconButton onClick={() => handleDelete(index)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                        </td>
-                                    </tr>
-                                    )}
-                                </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </tbody>
-                            </Box>
-                        )}
-                        </Droppable>
-                    </DragDropContext>
+                            ))}
+                        </tbody>
+                    </Box>
                 </Box>
+
             </Box>
         </Box>
         )

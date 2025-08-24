@@ -11,6 +11,7 @@ import {
 } from "@mui/material"
 import { presetColors, basicColors } from "@/constants/color";
 import { HexColorPicker } from "react-colorful";
+import { useRouter } from "next/navigation"
 
 import PopupAlert from "../utils/Popup";
 
@@ -77,8 +78,10 @@ function convertShapes(shapesOnCanvas: CustomObject[]) {
 }
 
 export default function SubscreenA() {
-    const { query, mode, topK } = useSearchContext();
-    const {searching, handleSearch} = useSearchResultContext()
+    const router = useRouter()
+
+    const { query, mode, topK, dataSource } = useSearchContext();
+    const {results, searching, handleSearch} = useSearchResultContext()
 
     // const [objectFilters, setObjectFilters] = useState<string[]>([]);
     
@@ -92,7 +95,9 @@ export default function SubscreenA() {
         setIsOpen(false)
     }
 
-    const [shapesOnCanvas, setShapesOnCanvas] = useState<CustomObject[]>([]);
+    // const [shapesOnCanvas, setShapesOnCanvas] = useState<CustomObject[]>([]);
+    const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
+
     const validateFilters = () => {
         if (query.trim() === "") {
             return { valid: false, severity: "warning" as const, message: "Cần nhập câu truy vấn trước" };
@@ -146,7 +151,8 @@ export default function SubscreenA() {
             color_filters: rgbColors,
             ocr_query: ocrQuery,
             asr_query: asrQuery,
-            top_k: topK
+            top_k: topK,
+            user_query: dataSource
         });
 
         fetchIgnoredImages(queryName)
@@ -154,7 +160,6 @@ export default function SubscreenA() {
 
     // const [autoIgnore, setAutoIgnore] = useState(false);
     // const {showList, setShowList,  currentPage, setCurrentPage} = useIgnoreContext()
-    const {results} = useSearchResultContext()
     // const sendHiddenTitles = async () => {
     //     const hiddenTitles = results
     //         .filter((_, idx) => !showList[idx])
@@ -361,7 +366,7 @@ export default function SubscreenA() {
                         </Button>
                     </Box>
 
-                    <Button variant="contained" onClick={() => {setOpenObjectFilter(true)}}>
+                    <Button variant="contained" onClick={() => setOpenObjectFilter(true)}>
                         Object filter
                     </Button>
                 </Box>
@@ -412,7 +417,7 @@ export default function SubscreenA() {
                     </Box>
                 </Box>
             )}
-
+            
         </Box>
     )
 }

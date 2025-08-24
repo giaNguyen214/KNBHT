@@ -15,6 +15,7 @@ export type CustomObject = {
 export type ObjectListProps = {
     objects: CustomObject[];
     handleAddShape: (shapeTemplate: any) => void;
+    shapesOnCanvas: CustomObject[];
 }
 
 export type ObjectContextType = {

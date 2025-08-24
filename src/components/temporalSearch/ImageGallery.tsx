@@ -33,7 +33,8 @@ type IgnoredItem = {
 };
 
 export default function ImageGallery( {results, cols, className }: ImageGalleryProps ) {
-    const {showList, setShowList, currentPage, setCurrentPage} = useIgnoreContext()
+    const {currentPage, setCurrentPage} = useIgnoreContext()
+    const {showList, setShowList} = useIgnoreImageContext()
     const {queryName} = useSearchContext()
     // const [showList, setShowList] = useState<boolean[]>([])
 
@@ -114,14 +115,14 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
     useEffect(() => {
         socket.on("ignoredImage", (newIgnored: { keyframe_id: string; username: string; query_name: string }[]) => {
             setIgnoredMap((prev) => {
-            const updated = new Map(prev);
-            newIgnored.forEach(({ keyframe_id, username, query_name }) => {
-                if (!updated.has(query_name)) {
-                updated.set(query_name, new Map());
-                }
-                updated.get(query_name)!.set(keyframe_id, username);
-            });
-            return updated;
+                const updated = new Map(prev);
+                newIgnored.forEach(({ keyframe_id, username, query_name }) => {
+                    if (!updated.has(query_name)) {
+                    updated.set(query_name, new Map());
+                    }
+                    updated.get(query_name)!.set(keyframe_id, username);
+                });
+                return updated;
             });
         });
 

@@ -69,12 +69,11 @@ export function useSearchResultContext() {
 const IgnoreContext = createContext<IgnoreContextType | undefined>(undefined);
 
 export function IgnoreProvider({ children }: { children: ReactNode }) {
-  const [showList, setShowList] = useState<boolean[]>([]);
   // phân trang
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <IgnoreContext.Provider value={{ showList, setShowList, currentPage, setCurrentPage }}>
+    <IgnoreContext.Provider value={{currentPage, setCurrentPage }}>
       {children}
     </IgnoreContext.Provider>
   );

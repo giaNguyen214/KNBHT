@@ -3,17 +3,17 @@ import { API_CONFIG } from "@/constants/api";
 import { SearchPayload} from "@/types/Search";
 
 export const simpleSearch = async (searchPayload: SearchPayload) => {
-    const username = localStorage.getItem("username") || "Unknown User";
+    // const username = localStorage.getItem("username") || "Unknown User";
 
     const payload = {
         text_query: searchPayload.text_query,
-        mode: "hybrid",
+        mode: searchPayload.mode,
         object_filters: searchPayload.object_filters || {},
         color_filters: searchPayload.color_filters || [],
         ocr_query: searchPayload.ocr_query,
         asr_query: searchPayload.asr_query,
         top_k: searchPayload.top_k,
-        user_query: username,
+        user_query: searchPayload.user_query,
     };
 
     if (process.env.NEXT_PUBLIC_MODE === "test") {

@@ -69,7 +69,8 @@ export default function SubscreenC() {
             color_filters: [],
             ocr_query: "",
             asr_query: "",
-            top_k: topK
+            top_k: topK,
+            user_query: dataSource
         });
 
         fetchIgnoredImages(queryName)

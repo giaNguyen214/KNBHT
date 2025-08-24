@@ -5,5 +5,6 @@ export type SearchPayload = {
     color_filters: [number, number, number][],
     ocr_query: string,
     asr_query: string,
-    top_k: number
+    top_k: number,
+    user_query: string
 }

@@ -8,11 +8,12 @@ const IgnoreImageContext = createContext< IgnoreImageContextType| undefined>(und
 
 export function IgnoreImageProvider({ children }: { children: ReactNode }) {
     // Map<queryName, Map<keyframe_id, username>>
+    const [showList, setShowList] = useState<boolean[]>([]);
     const [ignoredMap, setIgnoredMap] = useState<Map<string, Map<string, string>>>(new Map());
     const [ignoredUsernames, setIgnoredUsernames] = useState<(string | null)[]>([]);
 
     return (
-        <IgnoreImageContext.Provider value={{ignoredMap, setIgnoredMap, ignoredUsernames, setIgnoredUsernames}}>
+        <IgnoreImageContext.Provider value={{showList, setShowList, ignoredMap, setIgnoredMap, ignoredUsernames, setIgnoredUsernames}}>
         {children}
         </IgnoreImageContext.Provider>
     );

@@ -27,7 +27,7 @@ type ObjectFilterScreenProps = {
 };
 
 
-export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}: ObjectFilterScreenProps) {
+export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}:ObjectFilterScreenProps ) {
   // const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
 
   const handleAddShape = (shapeTemplate: any) => {
@@ -103,6 +103,7 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}:
 
   // const names: string[] = ["human", "cat", "dog"];
   const names = cocoObjects
+  
   const [defaultShapes, setDefaultShapes] = useState<CustomObject[]>([]);
   useEffect(() => {
     const shapes = names.map((name) => {
@@ -124,11 +125,12 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}:
   }, []);
 
   return (
-    <Box className="w-full h-full flex justify-center items-center">
+    <Box className="w-screen h-screen flex justify-center items-center bg-white">
       {/* Sidebar: List shape */}
       <ObjectList 
         objects={defaultShapes} 
         handleAddShape={(shapeTemplate) => handleAddShape(shapeTemplate)}
+        shapesOnCanvas={shapesOnCanvas}
       />
 
       {/* Canvas with grid */}

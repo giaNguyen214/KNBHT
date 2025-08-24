@@ -57,10 +57,18 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
     return (
         <Box className="w-full h-full">
             <Box className="w-full h-full flex justify-center items-center gap-10">
-                <Box className="h-[95vh] flex flex-col">
-                    <Box className="max-w-[60vw] h-full aspect-video bg-white border border-[#ccc] relative
-                        [background-image:linear-gradient(to_right,_#eee_1px,_transparent_1px),_linear-gradient(to_bottom,_#eee_1px,_transparent_1px)]
-                        [background-size:20px_20px] flex-1"
+                <Box className="flex flex-col">
+                    <Box
+                        sx={{
+                            width: "1280px",
+                            height: "720px",
+                            backgroundColor: "white",
+                            border: "1px solid #ccc",
+                            position: "relative",
+                            backgroundImage: `linear-gradient(to right, #eee 1px, transparent 1px),
+                                            linear-gradient(to bottom, #eee 1px, transparent 1px)`,
+                            backgroundSize: "20px 20px",
+                        }}
                     >
                         {shapesOnCanvas.map((shape) => {
                             const width = shape.x_max - shape.x_min;
@@ -146,59 +154,80 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                         })}
                     </Box>
 
-                    {/* <Box>
-                        <Typography 
-                            variant="caption" 
-                            sx={{ fontSize: "11px", marginBottom: "4px" }}
-                        >
-                            Tổng số object: {shapesOnCanvas.length}
-                        </Typography>
-
-                        <Table size="small">
-                            <TableBody>
-                            {fields.map((field) => (
-                                <TableRow key={field}>
-                                <TableCell
-                                    component="th"
-                                    scope="row"
-                                    sx={{ fontWeight: "bold", fontSize: "10px", padding: "2px 4px" }}
-                                >
-                                    {field}
-                                </TableCell>
-                                {shapesOnCanvas.map((shape, idx) => (
-                                    <TableCell 
-                                    key={idx} 
-                                    sx={{ fontSize: "10px", padding: "2px 4px" }}
-                                    >
-                                    {shape[field]}
-                                    </TableCell>
-                                ))}
-                                </TableRow>
-                            ))}
-                            </TableBody>
-                        </Table>
-                    </Box> */}
+                   
 
                 </Box>
-                <Box className="w-[15%]">
+                {/* <Box className="w-[15%]">
                     {
                         openColorPicker && (
                             <ColorPalettePicker color={color} setColor={setColor} shapesOnCanvas={shapesOnCanvas}/>
                         )
                     }
-                </Box>
-            </Box>
+                </Box> */}
 
-            {/* <Box>
-                Tổng số object: {shapesOnCanvas.length}
+                {openColorPicker && (
+  <Rnd
+    default={{
+      x: 100,
+      y: 100,
+      width: 260,
+      height: 320,
+    }}
+    bounds="parent"
+    dragHandleClassName="palette-drag-handle"
+    style={{
+      zIndex: 2000,
+      position: "absolute",
+      background: "white",
+      border: "1px solid #ccc",
+      borderRadius: 8,
+      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden", // chặn tràn ra ngoài Rnd
+    }}
+  >
+    {/* Header */}
+    <Box
+      className="palette-drag-handle"
+      sx={{
+        cursor: "move",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        px: 1,
+        py: 0.5,
+        borderBottom: "1px solid #eee",
+        backgroundColor: "#f9f9f9",
+        flexShrink: 0,
+      }}
+    >
+      <Typography variant="caption" sx={{ fontWeight: 600 }}>
+        Color Picker
+      </Typography>
+      <IconButton size="small" onClick={() => setOpenColorPicker(false)}>
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Box>
+
+    {/* Nội dung scroll được */}
+    <Box
+      sx={{
+        flex: 1,
+        overflow: "auto", // ✅ cho scroll dọc/ngang khi content tràn
+        p: 1,
+      }}
+    >
+      <ColorPalettePicker
+        color={color}
+        setColor={setColor}
+        shapesOnCanvas={shapesOnCanvas}
+      />
+    </Box>
+  </Rnd>
+)}
+
             </Box>
-            
-            {shapesOnCanvas.map((shape, index) => (
-                <Box key={index}>
-                    {shape.name} {shape.x_min} {shape.x_max} {shape.y_min} {shape.y_max} {shape.color} 
-                </Box>
-            ))} */}
-       
         </Box>
     )
 }

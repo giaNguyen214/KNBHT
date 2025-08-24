@@ -23,16 +23,16 @@ export default function Simple() {
         <IgnoreImageProvider>
             <Sidebar open={drawerOpen} setOpen={setDrawerOpen}/>
             <Box className="w-screen h-screen grid grid-cols-[1fr_2fr] gap-2">
-                {/* <ObjectProvider> */}
-                <IgnoreProvider>
-                    <Box className="w-full h-full p-2 grid grid-rows-[1fr_2fr] gap-1 min-h-0">
-                        <SearchResultProvider>
-                            <SubscreenA/>
-                            <SubscreenB/>
-                        </SearchResultProvider>
-                    </Box>
-                </IgnoreProvider>
-                {/* </ObjectProvider> */}
+                <ObjectProvider>
+                    <IgnoreProvider>
+                        <Box className="w-full h-full p-2 grid grid-rows-[1fr_2fr] gap-1 min-h-0">
+                            <SearchResultProvider>
+                                <SubscreenA/>
+                                <SubscreenB/>
+                            </SearchResultProvider>
+                        </Box>
+                    </IgnoreProvider>
+                </ObjectProvider>
 
                 <IgnoreProvider>
                     <Box className="w-full h-full p-2 grid grid-rows-[1fr_4fr] gap-1 min-h-0">
