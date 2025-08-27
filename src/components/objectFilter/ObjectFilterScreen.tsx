@@ -27,7 +27,7 @@ type ObjectFilterScreenProps = {
 };
 
 
-export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}:ObjectFilterScreenProps ) {
+export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, setOpenObjectFilter}:ObjectFilterScreenProps ) {
   // const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
 
   const handleAddShape = (shapeTemplate: any) => {
@@ -131,6 +131,7 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas}:
         objects={defaultShapes} 
         handleAddShape={(shapeTemplate) => handleAddShape(shapeTemplate)}
         shapesOnCanvas={shapesOnCanvas}
+        setOpenObjectFilter={setOpenObjectFilter}
       />
 
       {/* Canvas with grid */}

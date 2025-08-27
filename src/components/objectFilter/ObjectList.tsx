@@ -14,7 +14,7 @@ import {
 import { ObjectListProps } from "@/types/Object"
 import { useState } from "react"
 
-export default function ObjectList({ objects, handleAddShape, shapesOnCanvas = []   }: ObjectListProps) {
+export default function ObjectList({ objects, handleAddShape, setOpenObjectFilter, shapesOnCanvas = []   }: ObjectListProps) {
   // text hiện tại trong ô input
   const [value, setValue] = useState<string>("")
   const [inputValue, setInputValue] = useState<string>("")
@@ -41,52 +41,52 @@ export default function ObjectList({ objects, handleAddShape, shapesOnCanvas = [
   const fields = ["name", "x_min", "y_min", "x_max", "y_max", "color"] as const;
 
   return (
-    <Box className="h-full w-full">
-        <Box className="flex justify-center items-center gap-2 mb-2">
+    <Box className="h-full w-full flex flex-col justify-center items-center">
+        <Box className="w-full flex justify-center items-center gap-2 mb-2">
             <Autocomplete
-            freeSolo
-            options={names}
-            value={value}
-            inputValue={inputValue}
-            onChange={(_, newValue) => {
-                // khi chọn từ dropdown
-                setValue(newValue ?? "")
-                setInputValue(newValue ?? "")
-            }}
-            onInputChange={(_, newInputValue) => {
-                // khi gõ tay
-                setInputValue(newInputValue)
-            }}
-            renderInput={(params) => (
-                <TextField
-                {...params}
-                label="Chọn hoặc nhập object…"
-                variant="outlined"
-                size="small"
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                    e.preventDefault()
-                    addSelected()
-                    }
+                freeSolo
+                options={names}
+                value={value}
+                inputValue={inputValue}
+                onChange={(_, newValue) => {
+                    // khi chọn từ dropdown
+                    setValue(newValue ?? "")
+                    setInputValue(newValue ?? "")
                 }}
-                />
-            )}
-            fullWidth
-            clearOnEscape
-            disablePortal
-            selectOnFocus
-            handleHomeEndKeys
+                onInputChange={(_, newInputValue) => {
+                    // khi gõ tay
+                    setInputValue(newInputValue)
+                }}
+                renderInput={(params) => (
+                    <TextField
+                    {...params}
+                    label="Chọn hoặc nhập object…"
+                    variant="outlined"
+                    size="small"
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                        e.preventDefault()
+                        addSelected()
+                        }
+                    }}
+                    />
+                )}
+                fullWidth
+                clearOnEscape
+                disablePortal
+                selectOnFocus
+                handleHomeEndKeys
             />
             <Button
-            variant="contained"
-            onClick={addSelected}
-            disabled={!((inputValue || value)?.trim().length)}
+                variant="contained"
+                onClick={addSelected}
+                disabled={!((inputValue || value)?.trim().length)}
             >
-            Thêm
+                Thêm
             </Button>
         </Box>
 
-        <Box className="max-h-[65%] overflow-auto">
+        <Box className="max-h-[60%] overflow-auto">
             {objects.map((object) => (
             <Button 
                 key={object.name}
@@ -99,6 +99,7 @@ export default function ObjectList({ objects, handleAddShape, shapesOnCanvas = [
             </Button>
             ))}  
         </Box>
+        <Typography>{}</Typography>
         <Box>
             <Typography 
                 variant="caption" 
@@ -132,6 +133,13 @@ export default function ObjectList({ objects, handleAddShape, shapesOnCanvas = [
                     </TableBody> 
                 </Table> 
             </Box>
+            <Button 
+                onClick={() => setOpenObjectFilter(false)}
+                variant="contained"
+                fullWidth
+            > 
+                Thoát
+            </Button>
         </Box>
     </Box>
   )

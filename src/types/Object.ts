@@ -15,6 +15,7 @@ export type CustomObject = {
 export type ObjectListProps = {
     objects: CustomObject[];
     handleAddShape: (shapeTemplate: any) => void;
+    setOpenObjectFilter: React.Dispatch<React.SetStateAction<boolean>>;
     shapesOnCanvas: CustomObject[];
 }
 

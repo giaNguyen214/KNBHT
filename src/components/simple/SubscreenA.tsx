@@ -404,7 +404,7 @@ export default function SubscreenA() {
                         alignItems: "center",
                         zIndex: 1300,
                     }}
-                    onClick={() => setOpenObjectFilter(false)} // click overlay để đóng
+                    // onClick={() => setOpenObjectFilter(false)} // click overlay để đóng
                 >
                     <Box
                         className="w-[95vw] h-[90vh] bg-white flex justify-center items-center p-5"
@@ -413,6 +413,7 @@ export default function SubscreenA() {
                         <ObjectFilterScreen
                             shapesOnCanvas={shapesOnCanvas}
                             setShapesOnCanvas={setShapesOnCanvas}
+                            setOpenObjectFilter={setOpenObjectFilter}
                         />
                     </Box>
                 </Box>

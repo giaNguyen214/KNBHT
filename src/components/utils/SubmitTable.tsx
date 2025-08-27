@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { Box, Button, Typography, IconButton, TextField } from "@mui/material";
+import { Box, Button, Typography, IconButton, TextField, Switch, FormControlLabel } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Papa from "papaparse";
 import { useSearchContext } from "@/contexts/searchContext";
 import { useIgnoreImageContext } from "@/contexts/ignoreContext";
 import {fps} from "@/constants/fps"
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
 
 interface ResultModalProps {
   submit: boolean; // Khi true thì hiển thị modal
@@ -37,10 +40,17 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
     const {showList, setShowList} = useIgnoreImageContext()
     const {queryName} = useSearchContext()
 
-    const handleDelete = (index: number) => {
+    const handleDelete = (originalIndex: number) => {
         const updated = [...rows];
-        updated.splice(index, 1);
+        updated.splice(originalIndex, 1);
         setRows(updated);
+        // cập nhật editableOriginalIndex nếu cần
+        setEditableOriginalIndex(prev => {
+            if (prev === null) return prev;
+            if (originalIndex === prev) return null;           // xoá đúng row đang edit
+            if (originalIndex < prev) return prev - 1;         // các index sau bị dồn lên
+            return prev;
+        });
     };
 
     const handleEdit = (index: number, field: string, value: string) => {
@@ -51,39 +61,94 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
 
 
     // Tải CSV
-    const downloadFrameTxt = () => {
-        // Lấy 100 dòng đầu
-        const first100 = derivedRows.slice(0, 100);
+const downloadFrameTxt = () => {
+  // Lấy 100 dòng đầu (đã lọc theo showList)
+  const first100 = derivedRows.slice(0, 100);
 
-        // Mỗi dòng dạng "video_id,frame_id"
-        const lines = first100.map(r => `${r.video_id},${r.frame_id ?? ""}`);
+  // Helper: làm phẳng chuỗi để không xuống dòng / tab trong TXT
+  const sanitize = (v: unknown) =>
+    (v ?? "").toString().replace(/\r?\n/g, " ").replace(/\t/g, " ").trim();
 
-        const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `${queryName}_frames.txt`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        };
+  // Nếu showAnswer: mỗi dòng "video_id,frame_id,answer"
+  // Ngược lại: "video_id,frame_id"
+  const lines = first100.map((r) => {
+    const base = `${r.video_id},${r.frame_id ?? ""}`;
+    if (showAnswer) {
+      const ans = sanitize(rows[r.originalIndex]?.answer);
+      return `${base},${ans}`;
+    }
+    return base;
+  });
+
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  // đổi tên file khi có answer cho dễ nhận biết
+  link.setAttribute("download", `${queryName}${showAnswer ? "_frames_ans" : "_frames"}.txt`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
 
     // ngay trong component, trước phần return
+    // thay block derivedRows hiện tại bằng block này
     const derivedRows = rows
-    .filter((_, idx) => showList[idx])
-    .map((item) => {
-        const { video_id, timestamp } = parseKeyframeId(item.keyframe_id || "");
-        const fpsVal = getFpsForVideo(video_id);
-        const frame_id =
-            Number.isFinite(timestamp) && fpsVal != null ? Math.round(timestamp * fpsVal) : null;
-        return {
+        .map((item, idx) => ({ item, idx }))                 // giữ original index
+        .filter(({ idx }) => showList[idx])                  // lọc theo showList
+        .map(({ item, idx }) => {
+            const { video_id, timestamp } = parseKeyframeId(item.keyframe_id || "");
+            const fpsVal = getFpsForVideo(video_id);
+            const frame_id =
+                Number.isFinite(timestamp) && fpsVal != null ? Math.round(timestamp * fpsVal) : null;
+            return {
+            originalIndex: idx,          // dùng để edit/delete đúng dòng trong rows
             video_id,
-            timestamp,                // số giây (number)
-            fps: fpsVal,              // giữ số chính xác từ map fps
-            frame_id
-        };
+            timestamp,
+            fps: fpsVal,
+            frame_id,
+            note: item.answer ?? "",       // giữ ghi chú (nếu đã có)
+            };
     });
+
+    const [showAnswer, setShowAnswer] = useState(true);
+    // đặt trong component
+    const moveRow = (originalIndex: number, dir: -1 | 1) => {
+        // tìm vị trí của dòng đang hiển thị trong derivedRows
+        const i = derivedRows.findIndex(r => r.originalIndex === originalIndex);
+        const j = i + dir;
+        if (i < 0 || j < 0 || j >= derivedRows.length) return;
+
+        const a = derivedRows[i].originalIndex;   // index trong rows
+        const b = derivedRows[j].originalIndex;   // index trong rows
+
+        const next = [...rows];
+        [next[a], next[b]] = [next[b], next[a]];
+        setRows(next);
+    };
+
+    const moveUp = (originalIndex: number) => moveRow(originalIndex, -1);
+    const moveDown = (originalIndex: number) => moveRow(originalIndex, +1);
+
+    // Thêm row mới lên đầu
+    const [editableOriginalIndex, setEditableOriginalIndex] = useState<number | null>(null);
+    const addRowTop = (init?: Partial<any>) => {
+        const newRow = {
+            keyframe_id: "",  // có thể truyền vào qua init nếu muốn
+            answer: "",
+            ...(init || {}),
+        };
+
+        setRows(prev => [newRow, ...prev]);
+
+        // đảm bảo showList khớp thứ tự với rows
+        if (typeof setShowList === "function") {
+            setShowList(prev => [true, ...(prev ?? [])]);
+        }
+        setEditableOriginalIndex(0);
+    };
 
     return (
         submit && (
@@ -92,7 +157,7 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
             onClick={closeSubmitModal}
         >
             <Box
-                className="bg-white p-2 rounded-10 max-w-[700px] w-full h-[80vh] overflow-auto flex flex-col gap-2"
+                className="bg-white p-2 rounded-10 max-w-[1000px] w-full h-[80vh] overflow-auto flex flex-col gap-2"
                 onClick={(e) => e.stopPropagation()}
             >
                 <Box className="flex justify-around items-center">
@@ -126,6 +191,20 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
                         Query {queryName}
                     </Typography>
 
+                    <FormControlLabel
+                        control={
+                        <Switch
+                            checked={showAnswer}
+                            onChange={(e) => setShowAnswer(e.target.checked)}
+                        />
+                        }
+                        label="Q&A"
+                    />
+
+                    <Button variant="outlined" onClick={() => addRowTop()}>
+                        + Thêm dòng đầu
+                    </Button>
+
                     <Button variant="contained" onClick={downloadFrameTxt}>
                         Tải xuống
                     </Button>
@@ -136,30 +215,88 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
                         <thead>
                         <tr>
                             <th>#</th>
+                            <th>Keyframe ID</th> {/* NEW */}
                             <th>Video ID</th>
                             <th>Timestamp (s)</th>
                             <th>FPS</th>
                             <th>Frame ID</th>
+                            {showAnswer && <th>Answer</th>}
+                            <th>Di chuyển</th>
                             <th>Xóa</th>
                         </tr>
                         </thead>
                         <tbody>
-                            {derivedRows.map((row, index) => (
-                                <tr key={index}>
-                                    <td style={{ textAlign: "center" }}>{index + 1}</td>
-                                    <td style={{ textAlign: "center" }}>{row.video_id}</td>
-                                    <td style={{ textAlign: "center" }}>
-                                    {Number.isFinite(row.timestamp) ? row.timestamp : ""}
-                                    </td>
-                                    <td style={{ textAlign: "center" }}>{row.fps ?? ""}</td>
-                                    <td style={{ textAlign: "center" }}>{row.frame_id ?? ""}</td>
-                                    <td style={{ textAlign: "center" }}>
-                                    <IconButton onClick={() => handleDelete(index)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    </td>
-                                </tr>
-                            ))}
+                            {derivedRows.map((row, index) => {
+                                const isFirst = index === 0;
+                                const isLast = index === derivedRows.length - 1;
+                                const isKeyframeValid = Number.isFinite(row.timestamp) && !!row.video_id;
+
+                                return (
+                                    <tr key={index}>
+                                        <td style={{ textAlign: "center" }}>{index + 1}</td>
+
+                                        <td style={{ textAlign: "center" }}>
+                                            {row.originalIndex === editableOriginalIndex ? (
+                                                <TextField
+                                                    size="small"
+                                                    placeholder="L29_V005_0113.96s.jpg"
+                                                    value={rows[row.originalIndex]?.keyframe_id ?? ""}
+                                                    onChange={(e) =>
+                                                        handleEdit(row.originalIndex, "keyframe_id", e.target.value)
+                                                    }
+                                                    error={
+                                                        !!rows[row.originalIndex]?.keyframe_id &&
+                                                        !(Number.isFinite(row.timestamp) && !!row.video_id)
+                                                    }
+                                                    helperText={
+                                                        !!rows[row.originalIndex]?.keyframe_id &&
+                                                        !(Number.isFinite(row.timestamp) && !!row.video_id)
+                                                        ? "Định dạng: Lxx_Vyyy_ssss.s(s).jpg"
+                                                        : " "
+                                                    }
+                                                />
+                                            ) : (
+                                                <span>{rows[row.originalIndex]?.keyframe_id ?? ""}</span>
+                                            )}
+                                        </td>
+
+
+                                        <td style={{ textAlign: "center" }}>{row.video_id}</td>
+                                        <td style={{ textAlign: "center" }}>
+                                            {Number.isFinite(row.timestamp) ? row.timestamp : ""}
+                                        </td>
+                                        <td style={{ textAlign: "center" }}>{row.fps ?? ""}</td>
+                                        <td style={{ textAlign: "center" }}>{row.frame_id ?? ""}</td>
+                                        
+                                        {showAnswer && (
+                                            <td style={{ textAlign: "center" }}>
+                                            <TextField
+                                                size="small"
+                                                value={rows[row.originalIndex]?.answer ?? ""} 
+                                                onChange={(e) => handleEdit(row.originalIndex, "answer", e.target.value)}
+                                            />
+                                            </td>
+                                        )}
+
+                                        <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+                                            <IconButton size="small" onClick={() => moveUp(row.originalIndex)} disabled={isFirst}>
+                                                <KeyboardArrowUpIcon />
+                                            </IconButton>
+                                            <IconButton size="small" onClick={() => moveDown(row.originalIndex)} disabled={isLast}>
+                                                <KeyboardArrowDownIcon />
+                                            </IconButton>
+                                        </td>
+                                        
+                                        <td style={{ textAlign: "center" }}>
+                                            <IconButton onClick={() => handleDelete(row.originalIndex)}>
+                                            <DeleteIcon />
+                                            </IconButton>
+                                        </td>
+                                        
+                                        
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </Box>
                 </Box>
