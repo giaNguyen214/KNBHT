@@ -26,6 +26,7 @@ import { useIgnoreImageContext } from "@/contexts/ignoreContext";
 import CustomAvatar from "../utils/CustomAvatar";
 
 import socket from "@/lib/socket";
+import assetsIndex from "@/data/assetsIndex.json";
 
 type IgnoredItem = {
   keyframe_id: string;
@@ -160,6 +161,32 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
     function getFirstTwoParts(name) {
         return name.split("_").slice(0, 2).join("_");
     }
+
+    function useGroupImages(filename: string) {
+        if (!filename) return [];
+
+        const part = getFirstPart(filename);        // ví dụ "L30"
+        const group = getFirstTwoParts(filename);   // ví dụ "L30_V261"
+
+        try {
+            return assetsIndex[part][group]["_files"].map(
+            (img: string) => `/assets/${part}/${group}/${img}`
+            );
+        } catch (e) {
+            console.warn("Group not found in assetsIndex:", filename);
+            return [];
+        }
+    }
+
+    function getTimestampFromFilename(name: string) {
+        // name: "L26_V300_0300.60s.jpg"
+        const base = name.split("/").pop() || "";   // lấy phần cuối path
+        const withoutExt = base.replace(".jpg", ""); // "L26_V300_0300.60s"
+        const lastPart = withoutExt.split("_").pop() || ""; // "0300.60s"
+        return lastPart.replace("s", ""); // "0300.60"
+    }
+
+    const groupImages = openImage ? useGroupImages(openImage.title) : [];
     return (
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
@@ -182,7 +209,6 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                             <img
                                 src={imgSrc}
                                 alt={imgTitle}
-                                loading="lazy"
                                 className={`w-full h-auto border rounded-8 ${showList[globalIndex] ? "opacity-100" : "opacity-40"}`}
                             />
 
@@ -316,11 +342,19 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     Ignore
                 </Button>
             </Box>
-            {/* Dialog fullscreen */}
+
             <Dialog
                 open={!!openImage}
                 onClose={() => setOpenImage(null)}
                 maxWidth="lg"
+                PaperProps={{
+                    sx: {
+                    height: "100vh",    // chiếm full screen
+                    maxHeight: "100vh",   // không bị MUI auto giới hạn
+                    margin: 0,          // bỏ margin mặc định
+                    borderRadius: 0,    // bỏ bo tròn
+                    },
+                }}
                 slotProps={{
                     transition: { timeout: 0 }, // bỏ delay
                 }}
@@ -333,17 +367,68 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                         <img
                             src={openImage.img}
                             alt={openImage.title}
+                            loading="lazy" 
                             style={{
                                 width: "100%",
                                 height: "auto",
                                 borderRadius: 8,
-                                maxHeight: "80vh", // giới hạn chiều cao
+                                maxHeight: "70vh", // giới hạn chiều cao
                                 objectFit: "contain", // giữ nguyên tỉ lệ
                             }}
                         />
                         <Typography sx={{ mt: 1, textAlign: "center", fontFamily:'monospace' }}>
                             {openImage.title}
                         </Typography>
+
+                       
+                        <Box
+                            sx={{
+                                display: "flex",
+                                gap: 1,
+                                overflowX: "auto",
+                                mt: 2,
+                            }}
+                        >
+                            {groupImages.map((src) => {
+                                const filename = src.split("/").pop() || "";
+                                return (
+                                    <div
+                                        key={src}
+                                        style={{ flex: "0 0 auto" }}   // ✅ giữ kích thước thật, không co lại
+                                        className="flex flex-col items-center"
+                                    >
+                                        <img
+                                            src={src}
+                                            alt={filename}
+                                            style={{
+                                                height: 80,
+                                                width: "auto",
+                                                display: "block",
+                                                borderRadius: 6,
+                                                cursor: "pointer",
+                                                border:
+                                                openImage.img === src
+                                                    ? "2px solid #1976d2"
+                                                    : "1px solid #ccc",
+                                            }}
+                                            onClick={() =>
+                                                setOpenImage({ img: src, title: filename })
+                                            }
+                                        />
+                                        <Typography
+                                            sx={{
+                                                fontSize: "10px",
+                                                fontFamily: "monospace",
+                                                color: "#666",
+                                                mt: 0.5,
+                                            }}
+                                        >
+                                            {getTimestampFromFilename(src)}
+                                        </Typography>
+                                    </div>
+                                );
+                            })}
+                        </Box>
                     </Box>
                 )}
             </Dialog>

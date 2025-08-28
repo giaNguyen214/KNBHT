@@ -5,4 +5,6 @@ export type ColorPalletePickerProps = {
     color: string;
     setColor: React.Dispatch<React.SetStateAction<string>>
     shapesOnCanvas: CustomObject[];
+    circleMode: boolean;
+    setCircleMode: React.Dispatch<React.SetStateAction<boolean>>;
 }

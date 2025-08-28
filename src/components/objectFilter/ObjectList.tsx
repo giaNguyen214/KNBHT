@@ -120,13 +120,29 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
                                     {field} 
                                 </TableCell> 
                                 {shapesOnCanvas.map((shape, idx) => ( 
-                                    <TableCell 
-                                        key={idx} 
-                                        sx={{ fontSize: "10px", padding: "2px 4px" }} 
-                                    > 
-                                        {["x_min", "x_max", "y_min", "y_max"].includes(field) ? 
-                                        Math.round(Number(shape[field])) : shape[field]} 
-                                    </TableCell> 
+                                    <TableCell
+                                        key={idx}
+                                        sx={{ fontSize: "10px", padding: "2px 4px" }}
+                                        >
+                                        {["x_min", "x_max", "y_min", "y_max"].includes(field) ? (
+                                            Math.round(Number(shape[field]))
+                                        ) : field === "color" ? (
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                            <Box
+                                                sx={{
+                                                width: 12,
+                                                height: 12,
+                                                borderRadius: "2px",
+                                                border: "1px solid #ccc",
+                                                backgroundColor: shape.color,
+                                                }}
+                                            />
+                                            <Typography sx={{ fontSize: "10px" }}>{shape.color}</Typography>
+                                            </Box>
+                                        ) : (
+                                            shape[field]
+                                        )}
+                                    </TableCell>
                                 ))} 
                             </TableRow> 
                         ))} 

@@ -54,6 +54,8 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
     const fields = ["name", "x_min", "x_max", "y_min", "y_max", "color"] as const;
     type Field = typeof fields[number];
     
+    const [circleMode, setCircleMode] = useState(false)
+
     return (
         <Box className="w-full h-full">
             <Box className="w-full h-full flex justify-center items-center gap-10">
@@ -97,7 +99,7 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                                             ? '0 0 10px 3px rgba(0, 0, 0, 0.4)'
                                             : 'none',
                                         backgroundColor: shape.color,
-                                        borderRadius: 4,
+                                        borderRadius: circleMode ? "50%" : 4,
                                         position: "absolute",
 
                                     }}
@@ -222,6 +224,8 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
         color={color}
         setColor={setColor}
         shapesOnCanvas={shapesOnCanvas}
+        circleMode={circleMode}
+        setCircleMode={setCircleMode}
       />
     </Box>
   </Rnd>

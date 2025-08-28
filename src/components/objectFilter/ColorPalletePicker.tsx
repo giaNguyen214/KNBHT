@@ -18,6 +18,8 @@ import { ColorPalletePickerProps } from "@/types/Color";
 import { cssColorNames } from "@/constants/color";
 import InvertColorsIcon from "@mui/icons-material/InvertColors"
 import { presetColors } from "@/constants/color";
+import { Switch, FormControlLabel } from "@mui/material"
+
 
 function getContrastColor(bgColor: string) {
   // Bỏ dấu # nếu có
@@ -34,7 +36,7 @@ function getContrastColor(bgColor: string) {
 }
 
 
-export default function ColorPalettePicker({color, setColor, shapesOnCanvas}: ColorPalletePickerProps) {
+export default function ColorPalettePicker({color, setColor, shapesOnCanvas, setCircleMode}: ColorPalletePickerProps) {
   const [colorNameInput, setColorNameInput] = useState("");
   const [hexInput, setHexInput] = useState("");
 
@@ -87,6 +89,7 @@ export default function ColorPalettePicker({color, setColor, shapesOnCanvas}: Co
   
   return (
     <Box className="h-[85vh] w-full flex flex-col justify-center items-center gap-5">
+      
       <Box className="w-full grid grid-cols-5 gap-2">
         {presetColors.map((preset) => (
           <Box
