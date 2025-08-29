@@ -36,7 +36,7 @@ function getContrastColor(bgColor: string) {
 }
 
 
-export default function ColorPalettePicker({color, setColor, shapesOnCanvas, setCircleMode}: ColorPalletePickerProps) {
+export default function ColorPalettePicker({selectedShape, setSelectedShape}: ColorPalletePickerProps) {
   const [colorNameInput, setColorNameInput] = useState("");
   const [hexInput, setHexInput] = useState("");
 
@@ -64,7 +64,9 @@ export default function ColorPalettePicker({color, setColor, shapesOnCanvas, set
         document.body.removeChild(temp);
 
         const hex = rgbToHex(rgb);
-        setColor(hex);
+         if (selectedShape) {
+          setSelectedShape({ ...selectedShape, color: hex });
+        }
       } else {
         alert("Tên màu không hợp lệ!");
       }
@@ -78,7 +80,10 @@ export default function ColorPalettePicker({color, setColor, shapesOnCanvas, set
     const hexRegex = /^#?([0-9A-Fa-f]{6})$/;
     const match = hexInput.match(hexRegex);
     if (match) {
-      setColor(`#${match[1]}`);
+      // setColor(`#${match[1]}`);
+      if (selectedShape) {
+        setSelectedShape({ ...selectedShape, color: `#${match[1]}` });
+      }
     } else {
       alert("Mã hex không hợp lệ!");
     }
@@ -89,25 +94,97 @@ export default function ColorPalettePicker({color, setColor, shapesOnCanvas, set
   
   return (
     <Box className="h-[85vh] w-full flex flex-col justify-center items-center gap-5">
-      
+      {/* Toggle cho only_bbox / only_color / only_name */}
+<Box className="flex flex-col gap-2 w-full">
+  <FormControlLabel
+    control={
+      <Switch
+        checked={!!selectedShape?.only_bbox}
+        onChange={(e) => {
+          if (!selectedShape) return;
+          const checked = e.target.checked;
+          // Cập nhật selectedShape
+          setSelectedShape({
+            ...selectedShape,
+            only_bbox: checked,
+            only_color: false,
+            only_name: false,
+          });
+        }}
+      />
+    }
+    label="Only BBox"
+  />
+
+  <FormControlLabel
+    control={
+      <Switch
+        checked={!!selectedShape?.only_color}
+        onChange={(e) => {
+          if (!selectedShape) return;
+          const checked = e.target.checked;
+          setSelectedShape({
+            ...selectedShape,
+            only_color: checked,
+            only_bbox: false,
+            only_name: false,
+          });
+        }}
+      />
+    }
+    label="Only Color"
+  />
+
+  <FormControlLabel
+    control={
+      <Switch
+        checked={!!selectedShape?.only_name}
+        onChange={(e) => {
+          if (!selectedShape) return;
+          const checked = e.target.checked;
+          setSelectedShape({
+            ...selectedShape,
+            only_name: checked,
+            only_bbox: false,
+            only_color: false,
+          });
+        }}
+      />
+    }
+    label="Only Name"
+  />
+</Box>
+
+
       <Box className="w-full grid grid-cols-5 gap-2">
         {presetColors.map((preset) => (
           <Box
             key={preset}
-            onClick={() => setColor(preset)}
+            onClick={() => {
+              if (selectedShape) {
+                setSelectedShape({ ...selectedShape, color: preset });
+              }
+            }}
             style={{
               backgroundColor: preset,
               width: 32,
               height: 32,
               borderRadius: 4,
               cursor: "pointer",
-              border: preset === color ? "3px solid black" : "1px solid #ccc"
+              border: preset === selectedShape.color ? "3px solid black" : "1px solid #ccc"
             }}
           />
         ))}
       </Box>
       
-      <HexColorPicker color={color} onChange={setColor} />
+      <HexColorPicker
+        color={selectedShape?.color || "#000000"}
+        onChange={(hex) => {
+          if (selectedShape) {
+            setSelectedShape({ ...selectedShape, color: hex });
+          }
+        }}
+      />
       
       {/* Input tên màu */}
       <Box className="flex justify-around items-center w-full gap-2">
@@ -160,13 +237,13 @@ export default function ColorPalettePicker({color, setColor, shapesOnCanvas, set
 
       <Typography 
         sx={{
-          backgroundColor: color, 
-          color: getContrastColor(color),
+          backgroundColor: selectedShape.color, 
+          color: getContrastColor(selectedShape.color),
           userSelect: 'text', // Cho phép bôi đen
           padding: '2px',
         }}
       >
-          Selected {color}
+          Selected {selectedShape.color}
       </Typography>
 
       

@@ -10,9 +10,9 @@ export type CustomObject = {
     color: string;    
     width: number;
     height: number;
-    isCircle?: boolean
-    only_color?: boolean
-    only_bbox?: boolean
+    only_bbox?: boolean;
+    only_color?: boolean;
+    only_name?: boolean;
 }
 
 export type ObjectListProps = {

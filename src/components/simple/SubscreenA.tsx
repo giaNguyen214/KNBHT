@@ -46,7 +46,7 @@ function getContrastColor(bgColor: string) {
 }
 
 // Hàm chuyển hex sang [R, G, B]
-function hexToRgb(hex: string): [number, number, number] {
+function hexToRgb(hex: string): [number, number, number] | null {
   const cleanHex = hex.replace(/^#/, "");
   const bigint = parseInt(cleanHex, 16);
   const r = (bigint >> 16) & 255;
@@ -59,14 +59,22 @@ function convertShapes(shapesOnCanvas: CustomObject[]) {
   const result: Record<string, [number[], number[]][]> = {};
 
   for (const shape of shapesOnCanvas) {
-    const vec = hexToRgb(shape.color); // RGB từ color
-    const bbox = [
+    let vec = hexToRgb(shape.color); // RGB từ color
+    let bbox = [
         Math.round(shape.x_min),
         Math.round(shape.y_min),
         Math.round(shape.x_max),
         Math.round(shape.y_max)
     ];
 
+    if (shape.only_name) {
+      vec = null;
+      bbox = null;
+    } else if (shape.only_bbox) {
+      vec = null;
+    } else if (shape.only_color) {
+      bbox = null;
+    }
 
     if (!result[shape.name]) {
       result[shape.name] = [];

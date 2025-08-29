@@ -44,12 +44,12 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
             setShapesOnCanvas((prevShapes) =>
                 prevShapes.map((shape) =>
                     shape.id === selectedShape.id
-                        ? { ...shape, color }
+                        ? selectedShape 
                         : shape
                 )
             );
         }
-    }, [color, selectedShape, setShapesOnCanvas]);
+    }, [selectedShape, setShapesOnCanvas]);
 
     const fields = ["name", "x_min", "x_max", "y_min", "y_max", "color"] as const;
     type Field = typeof fields[number];
@@ -98,11 +98,36 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                                         boxShadow: (openColorPicker && selectedShape && shape.id === selectedShape.id)
                                             ? '0 0 10px 3px rgba(0, 0, 0, 0.4)'
                                             : 'none',
+                                        // backgroundColor: shape.only_bbox
+                                        //                 ? "transparent"
+                                        //                 : shape.only_name
+                                        //                     ? "transparent"
+                                        //                     : shape.color,
                                         backgroundColor: shape.color,
                                         borderRadius: circleMode ? "50%" : 4,
                                         position: "absolute",
 
                                     }}
+                                    // style={{
+  // 👉 bỏ border & nền nếu only_color
+//   border: shape.only_color
+//     ? "none"
+//     : (openColorPicker && selectedShape && shape.id === selectedShape.id)
+//         ? `2px dashed ${constrastColor}`
+//         : `1px solid ${constrastColor}`,
+
+//   boxShadow: (openColorPicker && selectedShape && shape.id === selectedShape.id && !shape.only_color)
+//     ? '0 0 10px 3px rgba(0, 0, 0, 0.4)'
+//     : 'none',
+
+//   backgroundColor: shape.only_bbox || shape.only_name || shape.only_color
+//     ? "transparent"
+//     : shape.color,
+
+//   borderRadius: circleMode ? "50%" : 4,
+//   position: "absolute",
+// }}
+
                                 >
                                     {/* Container full-size to position icons and text */}
                                     <Box
@@ -146,7 +171,16 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                                                 padding: '0 4px',
                                             }}
                                         >
-                                            <Typography variant="body2" sx={{color: constrastColor}}>
+                                            <Typography variant="body2" 
+                                                sx={{
+                                                    // color: shape.only_color
+                                                    //     ? shape.color // tên đổi màu theo color
+                                                    //     : shape.only_name
+                                                    //         ? "black" // hoặc "inherit" nếu muốn theo mặc định
+                                                    //         : "black",
+                                                    color: constrastColor
+                                                }}
+                                            >
                                                 {shape.name}
                                             </Typography>
                                         </Box>
@@ -223,7 +257,8 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
       <ColorPalettePicker
         color={color}
         setColor={setColor}
-        shapesOnCanvas={shapesOnCanvas}
+        selectedShape={selectedShape}
+        setSelectedShape={setSelectedShape}
         circleMode={circleMode}
         setCircleMode={setCircleMode}
       />
