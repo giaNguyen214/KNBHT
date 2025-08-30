@@ -250,7 +250,7 @@ export default function SubscreenC() {
                     valueLabelDisplay="auto"
                     step={100}
                     min={100}
-                    max={5000}
+                    max={2000}
                     sx={{ width: 200 }} // chỉnh độ dài thanh
                     />
                     </Box>
