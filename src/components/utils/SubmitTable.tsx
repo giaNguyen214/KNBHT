@@ -162,7 +162,8 @@ const downloadFrameTxt = () => {
     const base = `${r.video_id},${r.frame_id ?? ""}`;
     if (showAnswer) {
       const ans = sanitize(rows[r.originalIndex]?.answer);
-      return `${base},${ans}`;
+      // ✅ Thêm ngoặc kép bao quanh answer
+      return `${base},"${ans}"`;
     }
     return base;
   });
@@ -183,6 +184,7 @@ const downloadFrameTxt = () => {
   link.click();
   document.body.removeChild(link);
 };
+
 
 
 

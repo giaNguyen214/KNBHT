@@ -121,7 +121,7 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
                                 </TableCell> 
                                 {shapesOnCanvas.map((shape, idx) => ( 
                                     <TableCell
-                                        key={idx}
+                                        key={shape.id + "-" + field}
                                         sx={{ fontSize: "10px", padding: "2px 4px" }}
                                     >
                                         {(() => {
