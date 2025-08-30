@@ -88,7 +88,7 @@ export default function SubscreenC() {
       setDataSource(event.target.value as string);
     };
 
-    const QUERYNAME = Array.from({ length: 30 }, (_, i) => ({
+    const QUERYNAME = Array.from({ length: 25 }, (_, i) => ({
         value: `Q${i + 1}`,
         label: `Q${i + 1}`
     }));
