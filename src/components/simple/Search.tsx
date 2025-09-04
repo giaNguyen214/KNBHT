@@ -242,7 +242,13 @@ export default function Search() {
                             sx={{ width: 100 }} // 👈 ép nhỏ hơn
                         />
 
-                        <Button variant="contained" onClick={onSearchClick}>
+                        <Button 
+                            variant="contained" 
+                            onClick={onSearchClick}
+                            sx={{
+                                backgroundColor: searching ? "#9e9e9e" : "#1976d2",
+                            }}
+                        >
                             {searching ? "đang tìm kiếm..." : "Tìm kiếm"}
                         </Button>
 

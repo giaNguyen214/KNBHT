@@ -7,7 +7,6 @@ import {
     Chip
 } from "@mui/material"
 import { basicColors } from "@/constants/color";
-import { useRouter } from "next/navigation"
 
 import PopupAlert from "../utils/Popup";
 
@@ -16,7 +15,6 @@ import { useState } from "react";
 
 import ResultModal from "../utils/SubmitTable";
 import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
-import { useObjectContext } from "@/contexts/objectContext";
 import { CustomObject } from "@/types/Object";
 import ObjectFilterScreen from "../objectFilter/ObjectFilterScreen";
 
@@ -88,7 +86,7 @@ export default function Filter() {
         setIsOpen(false)
     }
 
-    const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
+    const [shapesOnCanvas, setShapesOnCanvas] = useState<CustomObject[]>([]);
 
     const validateFilters = () => {
         if (query.trim() === "") {
@@ -290,7 +288,13 @@ export default function Filter() {
 
                 <Box className="flex justify-around w-full">
                     <Box className="flex justify-center items-center gap-10">
-                        <Button variant="contained" onClick={onFilterClick}>
+                        <Button 
+                            variant="contained" 
+                            onClick={onFilterClick}
+                            sx={{
+                                backgroundColor: searching ? "#9e9e9e" : "#1976d2",
+                            }}
+                        >
                             {searching ? "filtering..." : "Filter"}
                         </Button>
 
@@ -310,7 +314,13 @@ export default function Filter() {
                         </Button>
                     </Box>
 
-                    <Button variant="contained" onClick={() => setOpenObjectFilter(true)}>
+                    <Button 
+                        variant="contained" 
+                        onClick={() => setOpenObjectFilter(true)}
+                        sx={{
+                            backgroundColor: "#008000",
+                        }}
+                    >
                         Object filter
                     </Button>
                 </Box>

@@ -32,10 +32,10 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
     );
 
     const template = found ?? { name, ...DEFAULT_TEMPLATE };
-    handleAddShape(template);
+        handleAddShape(template);
 
-    setValue("");
-    setInputValue("");
+        setValue("");
+        setInputValue("");
     };
 
   const fields = ["name", "x_min", "y_min", "x_max", "y_max", "color"] as const;
@@ -196,7 +196,7 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
                     </TableBody> 
                 </Table> 
             </Box>
-            
+
             <Button 
                 onClick={() => setOpenObjectFilter(false)}
                 variant="contained"

@@ -16,12 +16,14 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
         user_query: searchPayload.user_query,
     };
 
+    console.log("payload", JSON.stringify(payload, null, 2));
+
+
     if (process.env.NEXT_PUBLIC_MODE === "test") {
         const response = await axiosClient.get("https://685aaeb59f6ef9611157681f.mockapi.io/dientoangroup/gianguyen")
         return response.data
     }
 
-    console.log("payload", payload)
     const response = await axiosClient.post(API_CONFIG.ENDPOINTS.SEARCH.SIMPLE, payload)
     return response.data
 

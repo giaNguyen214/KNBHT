@@ -96,8 +96,8 @@ export default function Check() {
     <Box sx={{ p: 2 }}>
       <Sidebar open={drawerOpen} setOpen={setDrawerOpen}/>
       
-      <Typography variant="h6" sx={{ mb: 2, fontFamily: "monospace" }}>
-        Kiểm tra keyframe theo timestamp
+      <Typography variant="h6" sx={{ mb: 2, fontFamily: "monospace", textAlign:'center' }}>
+        Kiểm tra keyframe theo video và timestamp
       </Typography>
 
       <Box sx={{ display: "flex", gap: 2, alignItems: "center", justifyContent: "center", mb: 2 }}>
@@ -110,11 +110,16 @@ export default function Check() {
         />
 
         <TextField
-          label="Timestamp (12.34 hoặc .54, để trống mặc định là 0)"
+          label="Timestamp (vd: 12.34 hoặc .54, để trống mặc định là 0)"
           value={timestamp}
           onChange={(e) => setTimestamp(e.target.value)}
           size="small"
-          sx={{ width: 350 }}
+          sx={{
+            width: 350,
+            "& .MuiInputLabel-root": {
+              fontSize: "13px",   // 👈 chỉnh nhỏ hơn
+            },
+          }}
         />
         
         <Button variant="contained" onClick={handleLoad}>

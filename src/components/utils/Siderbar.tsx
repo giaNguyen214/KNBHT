@@ -8,24 +8,26 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ListItemButton from '@mui/material/ListItemButton';
 import { SidebarProps } from '@/types/Utils';
-import {useTheme} from '@mui/material';
+import { useTheme } from '@mui/material';
 
 import { useRouter } from 'next/navigation';
 
 export default function Sidebar({ open, setOpen }: SidebarProps) {
-  const router = useRouter()
+  const router = useRouter();
   const toggleDrawer = (state: boolean) => () => {
     setOpen(state);
   };
 
   const handleLogOut = () => {
     localStorage.removeItem("username");
-    router.push('/login')
-  }
+    router.push('/login');
+  };
 
   const theme = useTheme();
 
@@ -42,16 +44,16 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
             zIndex: 1300,
             backgroundColor: '#009688',
             boxShadow: 1,
-            p: '2px', 
-            minWidth: 'unset', 
-            transition: 'background-color 0.2s ease', 
-              '&:hover': {
-                  backgroundColor: '#00796b',
-              },  
+            p: '2px',
+            minWidth: 'unset',
+            transition: 'background-color 0.2s ease',
+            '&:hover': {
+              backgroundColor: '#00796b',
+            },
           }}
-      >
-        <MenuIcon sx={{ fontSize: 18 }}/>
-      </IconButton>
+        >
+          <MenuIcon sx={{ fontSize: 18 }} />
+        </IconButton>
       )}
 
       {/* Drawer sidebar */}
@@ -59,7 +61,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
         anchor="left"
         open={open}
         onClose={toggleDrawer(false)}
-        variant={'temporary'} 
+        variant={'temporary'}
         slotProps={{
           paper: {
             sx: {
@@ -75,57 +77,98 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
           </IconButton>
         </Box>
 
-        <List >
-          <ListItemButton onClick={() => router.push('/simple')} sx={{ gap: 0.5, minHeight: 40 }}>
-            <ListItemIcon  sx={{ minWidth: 30 }}> <SearchIcon/> </ListItemIcon>
-            <ListItemText primary="Simple search" slotProps={{
-              primary: {
-                sx: {
-                  fontFamily: ' monospace',
-                  fontWeight: 600,
+        <List>
+          {/* Simple search → router.push */}
+          <ListItemButton
+            onClick={() => router.push('/simple')}
+            sx={{ gap: 0.5, minHeight: 40 }}
+          >
+            <ListItemIcon sx={{ minWidth: 30 }}>
+              <SearchIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Simple search"
+              slotProps={{
+                primary: {
+                  sx: {
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                  },
                 },
-              },
-            }}/>
+              }}
+            />
           </ListItemButton>
 
-          <ListItemButton onClick={() => router.push('/submit')} sx={{ gap: 0.5, minHeight: 40 }}>
-            <ListItemIcon  sx={{ minWidth: 30 }}> <SearchIcon/> </ListItemIcon>
-            <ListItemText primary="Submit" slotProps={{
-              primary: {
-                sx: {
-                  fontFamily: ' monospace',
-                  fontWeight: 600,
+          {/* Submit → mở tab mới */}
+          <ListItemButton
+            component="a"
+            href="/submit"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ gap: 0.5, minHeight: 40 }}
+          >
+            <ListItemIcon sx={{ minWidth: 30 }}>
+              <UploadFileIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Submit"
+              slotProps={{
+                primary: {
+                  sx: {
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                  },
                 },
-              },
-            }}/>
+              }}
+            />
           </ListItemButton>
 
-          <ListItemButton onClick={() => router.push('/check-video')} sx={{ gap: 0.5, minHeight: 40 }}>
-            <ListItemIcon  sx={{ minWidth: 30 }}> <SearchIcon/> </ListItemIcon>
-            <ListItemText primary="Check video" slotProps={{
-              primary: {
-                sx: {
-                  fontFamily: ' monospace',
-                  fontWeight: 600,
+          {/* Check video → mở tab mới */}
+          <ListItemButton
+            component="a"
+            href="/check-video"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ gap: 0.5, minHeight: 40 }}
+          >
+            <ListItemIcon sx={{ minWidth: 30 }}>
+              <VideoLibraryIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Check video"
+              slotProps={{
+                primary: {
+                  sx: {
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                  },
                 },
-              },
-            }}/>
+              }}
+            />
           </ListItemButton>
-                  
-          <ListItemButton onClick={handleLogOut} sx={{ gap: 0.5, minHeight: 40 }}>
-            <ListItemIcon sx={{ minWidth: 30 }}> <LogoutIcon/> </ListItemIcon>
-            <ListItemText primary="Đăng xuất" slotProps={{
-              primary: {
-                sx: {
-                  fontFamily: 'monospace',
-                  fontWeight: 600,
+
+          {/* Đăng xuất */}
+          <ListItemButton
+            onClick={handleLogOut}
+            sx={{ gap: 0.5, minHeight: 40 }}
+          >
+            <ListItemIcon sx={{ minWidth: 30 }}>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Đăng xuất"
+              slotProps={{
+                primary: {
+                  sx: {
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                  },
                 },
-              },
-            }}/>
+              }}
+            />
           </ListItemButton>
         </List>
       </Drawer>
-      
     </div>
   );
 }
