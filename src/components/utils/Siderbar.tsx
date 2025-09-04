@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Drawer,
   IconButton,
@@ -8,13 +7,12 @@ import {
   Box,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChatIcon from '@mui/icons-material/Chat';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ListItemButton from '@mui/material/ListItemButton';
 import { SidebarProps } from '@/types/Utils';
-import {useTheme, useMediaQuery} from '@mui/material';
+import {useTheme} from '@mui/material';
 
 import { useRouter } from 'next/navigation';
 
@@ -24,34 +22,32 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
     setOpen(state);
   };
 
-
   const handleLogOut = () => {
     localStorage.removeItem("username");
     router.push('/login')
   }
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md ~ 960px
 
   return (
     <div>
       {/* Menu button */}
       {!open && (
         <IconButton
-        onClick={toggleDrawer(true)}
-        sx={{
-          position: 'fixed',
-          top: 1,
-          left: 1,
-          zIndex: 1300,
-          backgroundColor: '#009688',
-          boxShadow: 1,
-          p: '2px', // 👈 padding nhỏ lại
-          minWidth: 'unset', // tránh giữ size to
-          transition: 'background-color 0.2s ease', // mượt hơn
-            '&:hover': {
-                backgroundColor: '#00796b', // màu đậm hơn khi hover
-            },  
+          onClick={toggleDrawer(true)}
+          sx={{
+            position: 'fixed',
+            top: 1,
+            left: 1,
+            zIndex: 1300,
+            backgroundColor: '#009688',
+            boxShadow: 1,
+            p: '2px', 
+            minWidth: 'unset', 
+            transition: 'background-color 0.2s ease', 
+              '&:hover': {
+                  backgroundColor: '#00796b',
+              },  
           }}
       >
         <MenuIcon sx={{ fontSize: 18 }}/>
@@ -80,18 +76,6 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
         </Box>
 
         <List >
-          <ListItemButton onClick={() => {router.push('/temporal')}} sx={{ gap: 0.5, minHeight: 40 }}>
-            <ListItemIcon  sx={{ minWidth: 30 }}> <ChatIcon /> </ListItemIcon>
-            <ListItemText primary="Temporal search" slotProps={{
-              primary: {
-                sx: {
-                  fontFamily: ' monospace',
-                  fontWeight: 600,
-                },
-              },
-            }}/>
-          </ListItemButton>
- 
           <ListItemButton onClick={() => router.push('/simple')} sx={{ gap: 0.5, minHeight: 40 }}>
             <ListItemIcon  sx={{ minWidth: 30 }}> <SearchIcon/> </ListItemIcon>
             <ListItemText primary="Simple search" slotProps={{
@@ -116,9 +100,9 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
             }}/>
           </ListItemButton>
 
-          <ListItemButton onClick={() => router.push('/check')} sx={{ gap: 0.5, minHeight: 40 }}>
+          <ListItemButton onClick={() => router.push('/check-video')} sx={{ gap: 0.5, minHeight: 40 }}>
             <ListItemIcon  sx={{ minWidth: 30 }}> <SearchIcon/> </ListItemIcon>
-            <ListItemText primary="Check" slotProps={{
+            <ListItemText primary="Check video" slotProps={{
               primary: {
                 sx: {
                   fontFamily: ' monospace',

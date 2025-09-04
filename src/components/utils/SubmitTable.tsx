@@ -9,13 +9,11 @@ import { useSearchContext } from "@/contexts/searchContext";
 import { useIgnoreImageContext } from "@/contexts/ignoreContext";
 import { fps } from "@/constants/fps";
 
-// ---------------- AnswerCell ----------------
 interface AnswerCellProps {
   value: string;
   onChange: (val: string) => void;
 }
 const AnswerCell: React.FC<AnswerCellProps> = React.memo(({ value, onChange }) => {
-  // console.log("🔄 Re-render AnswerCell:", value);
   return (
     <TextField
       size="small"
@@ -25,7 +23,6 @@ const AnswerCell: React.FC<AnswerCellProps> = React.memo(({ value, onChange }) =
   );
 });
 
-// ---------------- Helpers ----------------
 const KEYFRAME_RE = /^(L\d+_V\d{3})_(\d+(?:\.\d+)?)s\.jpg$/;
 
 function parseKeyframeId(keyframe_id: string) {
@@ -42,7 +39,6 @@ function getFpsForVideo(video_id: string): number | null {
   return null;
 }
 
-// ---------------- TableRowItem ----------------
 interface TableRowProps {
   row: {
     index: number;
@@ -65,7 +61,6 @@ interface TableRowProps {
 
 const TableRowItem: React.FC<TableRowProps> = React.memo(
   ({ row, isFirst, isLast, editableOriginalIndex, onEdit, onDelete, onMove, showAnswer }) => {
-    // console.log("🔥 Re-render row:", row.originalIndex);
 
     return (
       <tr>
@@ -119,7 +114,6 @@ const TableRowItem: React.FC<TableRowProps> = React.memo(
     prev.showAnswer === next.showAnswer
 );
 
-// ---------------- Main Component ----------------
 interface ResultModalProps {
   submit: boolean;
   closeSubmitModal: () => void;
@@ -127,8 +121,7 @@ interface ResultModalProps {
   mode: string;
 }
 
-export default function ResultModal({ submit, closeSubmitModal, results, mode }: ResultModalProps) {
-  // console.log("⚡ Re-render ResultModal");
+export default function SubmitTable({ submit, closeSubmitModal, results, mode }: ResultModalProps) {
   const [rows, setRows] = useState(results.slice(0, 100));
   const { showList, setShowList } = useIgnoreImageContext();
   const { queryName } = useSearchContext();
@@ -153,40 +146,37 @@ export default function ResultModal({ submit, closeSubmitModal, results, mode }:
     setRows(updated);
   };
 
-const downloadFrameTxt = () => {
-  const first100 = derivedRows.slice(0, 100);
-  const sanitize = (v: unknown) =>
-    (v ?? "").toString().replace(/\r?\n/g, " ").replace(/\t/g, " ").trim();
+  const downloadFrameTxt = () => {
+    const first100 = derivedRows.slice(0, 100);
+    const sanitize = (v: unknown) =>
+      (v ?? "").toString().replace(/\r?\n/g, " ").replace(/\t/g, " ").trim();
 
-  const lines = first100.map((r) => {
-    const base = `${r.video_id},${r.frame_id ?? ""}`;
-    if (showAnswer) {
-      const ans = sanitize(rows[r.originalIndex]?.answer);
-      // ✅ Thêm ngoặc kép bao quanh answer
-      return `${base},"${ans}"`;
-    }
-    return base;
-  });
+    const lines = first100.map((r) => {
+      const base = `${r.video_id},${r.frame_id ?? ""}`;
+      if (showAnswer) {
+        const ans = sanitize(rows[r.originalIndex]?.answer);
+        // Thêm ngoặc kép bao quanh answer
+        return `${base},"${ans}"`;
+      }
+      return base;
+    });
 
-  // ❌ Không thêm \uFEFF → UTF-8 thuần
-  // ✅ Xuống dòng theo CRLF cho Windows
-  const content = lines.join("\r\n");
+    // Không thêm \uFEFF → UTF-8 thuần
+    // Xuống dòng theo CRLF cho Windows
+    const content = lines.join("\r\n");
 
-  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute(
-    "download",
-    `${queryName}${showAnswer ? "_frames_ans" : "_frames"}.csv`
-  );
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-
-
+    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `${queryName}${showAnswer ? "_frames_ans" : "_frames"}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const derivedRows = rows
     .map((item, idx) => ({ item, idx }))

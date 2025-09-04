@@ -5,10 +5,6 @@ import { Rnd } from 'react-rnd';
 import { 
     Box, 
     Typography,
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableRow
 } from "@mui/material";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -51,9 +47,6 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
         }
     }, [selectedShape, setShapesOnCanvas]);
 
-    const fields = ["name", "x_min", "x_max", "y_min", "y_max", "color"] as const;
-    type Field = typeof fields[number];
-    
     const [circleMode, setCircleMode] = useState(false)
 
     return (
@@ -193,79 +186,72 @@ export default function CanvasEditor({shapesOnCanvas, setShapesOnCanvas, handleD
                    
 
                 </Box>
-                {/* <Box className="w-[15%]">
-                    {
-                        openColorPicker && (
-                            <ColorPalettePicker color={color} setColor={setColor} shapesOnCanvas={shapesOnCanvas}/>
-                        )
-                    }
-                </Box> */}
+
 
                 {openColorPicker && (
-  <Rnd
-    default={{
-      x: 100,
-      y: 100,
-      width: 260,
-      height: 320,
-    }}
-    bounds="parent"
-    dragHandleClassName="palette-drag-handle"
-    style={{
-      zIndex: 2000,
-      position: "absolute",
-      background: "white",
-      border: "1px solid #ccc",
-      borderRadius: 8,
-      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden", // chặn tràn ra ngoài Rnd
-    }}
-  >
-    {/* Header */}
-    <Box
-      className="palette-drag-handle"
-      sx={{
-        cursor: "move",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        px: 1,
-        py: 0.5,
-        borderBottom: "1px solid #eee",
-        backgroundColor: "#f9f9f9",
-        flexShrink: 0,
-      }}
-    >
-      <Typography variant="caption" sx={{ fontWeight: 600 }}>
-        Color Picker
-      </Typography>
-      <IconButton size="small" onClick={() => setOpenColorPicker(false)}>
-        <DeleteIcon fontSize="small" />
-      </IconButton>
-    </Box>
+                    <Rnd
+                        default={{
+                        x: 100,
+                        y: 100,
+                        width: 260,
+                        height: 320,
+                        }}
+                        bounds="parent"
+                        dragHandleClassName="palette-drag-handle"
+                        style={{
+                        zIndex: 2000,
+                        position: "absolute",
+                        background: "white",
+                        border: "1px solid #ccc",
+                        borderRadius: 8,
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+                        display: "flex",
+                        flexDirection: "column",
+                        overflow: "hidden", // chặn tràn ra ngoài Rnd
+                        }}
+                    >
+                        {/* Header */}
+                        <Box
+                            className="palette-drag-handle"
+                            sx={{
+                                cursor: "move",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                px: 1,
+                                py: 0.5,
+                                borderBottom: "1px solid #eee",
+                                backgroundColor: "#f9f9f9",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                                Color Picker
+                            </Typography>
+                            <IconButton size="small" onClick={() => setOpenColorPicker(false)}>
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Box>
 
-    {/* Nội dung scroll được */}
-    <Box
-      sx={{
-        flex: 1,
-        overflow: "auto", // ✅ cho scroll dọc/ngang khi content tràn
-        p: 1,
-      }}
-    >
-      <ColorPalettePicker
-        color={color}
-        setColor={setColor}
-        selectedShape={selectedShape}
-        setSelectedShape={setSelectedShape}
-        circleMode={circleMode}
-        setCircleMode={setCircleMode}
-      />
-    </Box>
-  </Rnd>
-)}
-
+                        {/* Nội dung scroll được */}
+                        <Box
+                            sx={{
+                                flex: 1,
+                                overflow: "auto", // ✅ cho scroll dọc/ngang khi content tràn
+                                p: 1,
+                            }}
+                        >
+                        <ColorPalettePicker
+                            color={color}
+                            setColor={setColor}
+                            selectedShape={selectedShape}
+                            setSelectedShape={setSelectedShape}
+                            circleMode={circleMode}
+                            setCircleMode={setCircleMode}
+                        />
+                        </Box>
+                    </Rnd>
+                )}
             </Box>
         </Box>
     )

@@ -3,7 +3,6 @@ import {
     ImageList,
     ImageListItem,
     IconButton,
-    Dialog,
     Typography,
     Pagination,
     Button,
@@ -24,21 +23,28 @@ import { useSearchContext, useIgnoreContext } from "@/contexts/searchContext";
 import { useIgnoreImageContext } from "@/contexts/ignoreContext";
 
 import CustomAvatar from "../utils/CustomAvatar";
-
 import socket from "@/lib/socket";
-import assetsIndex from "@/data/assetsIndex.json";
+import CheckImage from "./CheckVideo";
 
-type IgnoredItem = {
-  keyframe_id: string;
-  username: string;
-};
+
+import assetsIndexL from "@/data/assetsIndex_L.json";
+import assetsIndexK from "@/data/assetsIndex_K01_K20.json";
 
 export default function ImageGallery( {results, cols, className }: ImageGalleryProps ) {
+    const [assetsIndex, setAssetsIndex] = useState<Record<string, any> | null>(null);
+    useEffect(() => {
+        // Gộp 2 asset lại
+        const mergedAssets = {
+        ...assetsIndexL,
+        ...assetsIndexK,
+        };
+
+        setAssetsIndex(mergedAssets);
+    }, []);
+
     const {currentPage, setCurrentPage} = useIgnoreContext()
     const {showList, setShowList} = useIgnoreImageContext()
     const {queryName} = useSearchContext()
-    // const [showList, setShowList] = useState<boolean[]>([])
-
     // Khi results thay đổi, reset showList cho đúng số lượng item
     useEffect(() => {
         setShowList(Array(results.length).fill(true));
@@ -64,8 +70,6 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
             // Trường hợp đang OFF -> Bật ON
             setPrevShowList(showList); // lưu trạng thái trước đó
 
-            // setShowList(Array(showList.length).fill(false)); // hide hết
-            // setShowList(Array(itemsPerPage).fill(true));
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
 
@@ -95,6 +99,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
             setUsername(storedUsername);
         }
     }, []);
+
     // socket config
     const sendHiddenTitles = async () => {
         const hiddenTitles = results
@@ -109,9 +114,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
         });
     };
     
-
     const {ignoredMap, setIgnoredMap, ignoredUsernames, setIgnoredUsernames} = useIgnoreImageContext()
-
 
     useEffect(() => {
         socket.on("ignoredImage", (newIgnored: { keyframe_id: string; username: string; query_name: string }[]) => {
@@ -119,7 +122,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                 const updated = new Map(prev);
                 newIgnored.forEach(({ keyframe_id, username, query_name }) => {
                     if (!updated.has(query_name)) {
-                    updated.set(query_name, new Map());
+                        updated.set(query_name, new Map());
                     }
                     updated.get(query_name)!.set(keyframe_id, username);
                 });
@@ -140,11 +143,11 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
 
         results.forEach(item => {
             if (currentIgnored.has(item.keyframe_id)) {
-            newShowList.push(false);
-            newIgnoredUsernames.push(currentIgnored.get(item.keyframe_id) || null);
+                newShowList.push(false);
+                newIgnoredUsernames.push(currentIgnored.get(item.keyframe_id) || null);
             } else {
-            newShowList.push(true);
-            newIgnoredUsernames.push(null);
+                newShowList.push(true);
+                newIgnoredUsernames.push(null);
             }
         });
 
@@ -170,7 +173,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
 
         try {
             return assetsIndex[part][group]["_files"].map(
-            (img: string) => `/assets/${part}/${group}/${img}`
+                (img: string) => `/assets/${part}/${group}/${img}`
             );
         } catch (e) {
             console.warn("Group not found in assetsIndex:", filename);
@@ -187,23 +190,18 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
     }
 
     const groupImages = openImage ? useGroupImages(openImage.title) : [];
+
+    const [currentTimestamp, setCurrentTimestamp] = useState<number | null>(null);
+
     return (
         <Box className={className || "w-[60%] h-[90%] ml-5 border border-solid border-black rounded-[2%] overflow-auto"}>
             <ImageList cols={cols} gap={12} className="w-full m-0 overflow-x-hidden">
                 {paginatedResults.map((item, index) => {
                     const globalIndex = startIndex + index; // dùng để index vào showList
-                    // console.log("Render item", globalIndex);
-
-                    // let imgSrc = `${base_folder}/${item.keyframe_id}`; // mặc định
-                    // if (process.env.NEXT_PUBLIC_MODE !== "test") {
-                    //     const [l, _, v] = item.video_id.split("_"); // destructuring, bỏ phần giữa
-                    //     // console.log("l, v", l, v)
-                    //     imgSrc = `${base_folder}/${l}/${v}/${item.keyframe_id}`; // mặc định
-                    // }
                     const filename = item.keyframe_id
                     let imgSrc = `${base_folder}/${getFirstPart(filename)}/${getFirstTwoParts(filename)}/${filename}`; // mặc định
-
                     const imgTitle = `${item.keyframe_id}`;
+
                     return (
                         <ImageListItem key={globalIndex} className="relative">
                             <img
@@ -259,7 +257,11 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
 
                             {/* Overlay icon Fullscreen */}
                             <IconButton
-                                onClick={() => setOpenImage({ img: imgSrc, title: imgTitle })}
+                                onClick={() => {
+                                    setOpenImage({ img: imgSrc, title: imgTitle });
+                                    const timestamp = parseFloat(getTimestampFromFilename(filename));
+                                    setCurrentTimestamp(timestamp);
+                                }}
                                 sx={{
                                     position: "absolute",
                                     bottom: "5px",
@@ -293,6 +295,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     )
                 })}
             </ImageList>
+
             <Box className="w-full flex justify-around items-center p-4">
                 <Pagination 
                     count={pageCount}
@@ -342,96 +345,15 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     Ignore
                 </Button>
             </Box>
+            
+            <CheckImage
+                openImage={openImage}
+                setOpenImage={setOpenImage}
+                groupImages={groupImages}
+                currentTimestamp={currentTimestamp}
+                setCurrentTimestamp={setCurrentTimestamp}
+            />
 
-            <Dialog
-                open={!!openImage}
-                onClose={() => setOpenImage(null)}
-                maxWidth="lg"
-                PaperProps={{
-                    sx: {
-                    height: "100vh",    // chiếm full screen
-                    maxHeight: "100vh",   // không bị MUI auto giới hạn
-                    margin: 0,          // bỏ margin mặc định
-                    borderRadius: 0,    // bỏ bo tròn
-                    },
-                }}
-                slotProps={{
-                    transition: { timeout: 0 }, // bỏ delay
-                }}
-                slots={{
-                    transition: undefined, // tắt animation
-                }}
-            >
-                {openImage && (
-                    <Box className="p-2 h-full overflow-hidden">
-                        <img
-                            src={openImage.img}
-                            alt={openImage.title}
-                            loading="lazy" 
-                            style={{
-                                width: "100%",
-                                height: "auto",
-                                borderRadius: 8,
-                                maxHeight: "70vh", // giới hạn chiều cao
-                                objectFit: "contain", // giữ nguyên tỉ lệ
-                            }}
-                        />
-                        <Typography sx={{ mt: 1, textAlign: "center", fontFamily:'monospace' }}>
-                            {openImage.title}
-                        </Typography>
-
-                       
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 1,
-                                overflowX: "auto",
-                                mt: 2,
-                            }}
-                        >
-                            {groupImages.map((src) => {
-                                const filename = src.split("/").pop() || "";
-                                return (
-                                    <div
-                                        key={src}
-                                        style={{ flex: "0 0 auto" }}   // ✅ giữ kích thước thật, không co lại
-                                        className="flex flex-col items-center"
-                                    >
-                                        <img
-                                            src={src}
-                                            alt={filename}
-                                            style={{
-                                                height: 80,
-                                                width: "auto",
-                                                display: "block",
-                                                borderRadius: 6,
-                                                cursor: "pointer",
-                                                border:
-                                                openImage.img === src
-                                                    ? "2px solid #1976d2"
-                                                    : "1px solid #ccc",
-                                            }}
-                                            onClick={() =>
-                                                setOpenImage({ img: src, title: filename })
-                                            }
-                                        />
-                                        <Typography
-                                            sx={{
-                                                fontSize: "10px",
-                                                fontFamily: "monospace",
-                                                color: "#666",
-                                                mt: 0.5,
-                                            }}
-                                        >
-                                            {getTimestampFromFilename(src)}
-                                        </Typography>
-                                    </div>
-                                );
-                            })}
-                        </Box>
-                    </Box>
-                )}
-            </Dialog>
         </Box>
     );
 }

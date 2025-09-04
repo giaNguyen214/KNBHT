@@ -88,18 +88,18 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
 
         <Box className="max-h-[60%] overflow-auto">
             {objects.map((object) => (
-            <Button 
-                key={object.name}
-                onClick={() => handleAddShape(object)}
-                variant="outlined"
-                className="mt-1"
-                fullWidth
-            >
-                {object.name}
-            </Button>
+                <Button 
+                    key={object.name}
+                    onClick={() => handleAddShape(object)}
+                    variant="outlined"
+                    className="mt-1"
+                    fullWidth
+                >
+                    {object.name}
+                </Button>
             ))}  
         </Box>
-        <Typography>{}</Typography>
+
         <Box>
             <Typography 
                 variant="caption" 
@@ -107,6 +107,7 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
             >
                 Tổng số object: {shapesOnCanvas.length}
             </Typography>
+
             <Box className="max-w-[250px] overflow-y-auto"> 
                 <Table size="small"> 
                     <TableBody> 
@@ -132,57 +133,59 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
 
                                             // Nếu bật only_name → các field khác ẩn hết
                                             if (shape.only_name) {
-                                            return null;
+                                                return null;
                                             }
 
                                             // Nếu bật only_bbox → chỉ hiện tọa độ
                                             if (shape.only_bbox) {
-                                            return ["x_min", "x_max", "y_min", "y_max"].includes(field)
-                                                ? Math.round(Number(shape[field]))
-                                                : null;
+                                                return ["x_min", "x_max", "y_min", "y_max"].includes(field)
+                                                    ? Math.round(Number(shape[field]))
+                                                    : null;
                                             }
 
                                             // Nếu bật only_color → chỉ hiện màu
                                             if (shape.only_color) {
-                                            if (field === "color") {
-                                                return (
-                                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                                    <Box
-                                                    sx={{
-                                                        width: 12,
-                                                        height: 12,
-                                                        borderRadius: "2px",
-                                                        border: "1px solid #ccc",
-                                                        backgroundColor: shape.color,
-                                                    }}
-                                                    />
-                                                    <Typography sx={{ fontSize: "10px" }}>{shape.color}</Typography>
-                                                </Box>
-                                                );
-                                            }
-                                            return null;
+                                                if (field === "color") {
+                                                    return (
+                                                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                            <Box
+                                                                sx={{
+                                                                    width: 12,
+                                                                    height: 12,
+                                                                    borderRadius: "2px",
+                                                                    border: "1px solid #ccc",
+                                                                    backgroundColor: shape.color,
+                                                                }}
+                                                            />
+                                                            <Typography sx={{ fontSize: "10px" }}>{shape.color}</Typography>
+                                                        </Box>
+                                                    );
+                                                }
+                                                return null;
                                             }
 
                                             // Trường hợp không có flag nào: hiển thị như cũ
                                             if (["x_min", "x_max", "y_min", "y_max"].includes(field)) {
-                                            return Math.round(Number(shape[field]));
+                                                return Math.round(Number(shape[field]));
                                             }
+
                                             if (field === "color") {
-                                            return (
-                                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                                <Box
-                                                    sx={{
-                                                    width: 12,
-                                                    height: 12,
-                                                    borderRadius: "2px",
-                                                    border: "1px solid #ccc",
-                                                    backgroundColor: shape.color,
-                                                    }}
-                                                />
-                                                <Typography sx={{ fontSize: "10px" }}>{shape.color}</Typography>
-                                                </Box>
-                                            );
+                                                return (
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                        <Box
+                                                            sx={{
+                                                            width: 12,
+                                                            height: 12,
+                                                            borderRadius: "2px",
+                                                            border: "1px solid #ccc",
+                                                            backgroundColor: shape.color,
+                                                            }}
+                                                        />
+                                                        <Typography sx={{ fontSize: "10px" }}>{shape.color}</Typography>
+                                                    </Box>
+                                                );
                                             }
+
                                             return shape[field];
                                         })()}
                                         </TableCell>
@@ -193,6 +196,7 @@ export default function ObjectList({ objects, handleAddShape, setOpenObjectFilte
                     </TableBody> 
                 </Table> 
             </Box>
+            
             <Button 
                 onClick={() => setOpenObjectFilter(false)}
                 variant="contained"

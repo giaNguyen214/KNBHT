@@ -2,28 +2,17 @@
 
 import { 
     Box,
-    Typography,
     TextField,
     Button,
-    Checkbox,
-    FormControlLabel,
     Chip
 } from "@mui/material"
-import { presetColors, basicColors } from "@/constants/color";
-import { HexColorPicker } from "react-colorful";
+import { basicColors } from "@/constants/color";
 import { useRouter } from "next/navigation"
 
 import PopupAlert from "../utils/Popup";
 
 import { useSearchContext, useSearchResultContext } from "@/contexts/searchContext";
 import { useState } from "react";
-
-import MultiColorPicker from "../utils/ColorPicker";
-
-import { useIgnoreContext } from "@/contexts/searchContext";
-import axios from "axios";
-
-import { itemsPerPage } from "@/constants/keyframe";
 
 import ResultModal from "../utils/SubmitTable";
 import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
@@ -85,13 +74,9 @@ function convertShapes(shapesOnCanvas: CustomObject[]) {
   return result;
 }
 
-export default function SubscreenA() {
-    const router = useRouter()
-
+export default function Filter() {
     const { query, mode, topK, dataSource } = useSearchContext();
     const {results, searching, handleSearch} = useSearchResultContext()
-
-    // const [objectFilters, setObjectFilters] = useState<string[]>([]);
     
     const [ocrQuery, setOcrQuery] = useState("");
     const [asrQuery, setAsrQuery] = useState("");
@@ -103,7 +88,6 @@ export default function SubscreenA() {
         setIsOpen(false)
     }
 
-    // const [shapesOnCanvas, setShapesOnCanvas] = useState<CustomObject[]>([]);
     const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
 
     const validateFilters = () => {
@@ -150,8 +134,7 @@ export default function SubscreenA() {
             asr_query: asrQuery,
             top_k: topK
         }
-        console.log("payload", JSON.stringify(payload, null, 2));
-        // const topK_value = topK === "" ? 100 : Number(topK);
+
         handleSearch({
             text_query: query,
             mode: mode,
@@ -165,52 +148,6 @@ export default function SubscreenA() {
 
         fetchIgnoredImages(queryName)
     };
-
-    // const [autoIgnore, setAutoIgnore] = useState(false);
-    // const {showList, setShowList,  currentPage, setCurrentPage} = useIgnoreContext()
-    // const sendHiddenTitles = async () => {
-    //     const hiddenTitles = results
-    //         .filter((_, idx) => !showList[idx])
-    //         .map(item => `${item.video_id}_${item.keyframe_id}`);
-
-    //     try {
-    //         console.log("hidden titles: ", hiddenTitles)
-    //         await axios.post("/api/hide-list", { hiddenTitles });
-    //         console.log("Đã gửi thành công!");
-    //     } catch (err) {
-    //         console.error("Lỗi khi gửi:", err);
-    //     }
-    // };
-
-    // const [prevShowList, setPrevShowList] = useState<boolean[]>([]);
-    // const handleAutoIgnoreChange = () => {
-    //     if (!autoIgnore) {
-    //         // Trường hợp đang OFF -> Bật ON
-    //         setPrevShowList(showList); // lưu trạng thái trước đó
-
-    //         // setShowList(Array(showList.length).fill(false)); // hide hết
-    //         // setShowList(Array(itemsPerPage).fill(true));
-    //         const startIndex = (currentPage - 1) * itemsPerPage;
-    //         const endIndex = startIndex + itemsPerPage;
-
-    //         setShowList(prev =>
-    //             prev.map((val, i) => {
-    //                 if (i >= startIndex && i < endIndex) {
-    //                     return false; // hide ảnh trong trang hiện tại
-    //                 }
-    //                 return val; // giữ nguyên các trang khác
-    //             })
-    //         );
-
-    //         setAutoIgnore(true);
-    //     } else {
-    //         // Trường hợp đang ON -> Tắt OFF
-    //         if (prevShowList.length > 0) {
-    //             setShowList(prevShowList); // khôi phục trạng thái cũ
-    //         }
-    //         setAutoIgnore(false);
-    //     }
-    // };
 
     const [colors, setColors] = useState<string[]>([]);
     const [currentColor, setCurrentColor] = useState("#000000");
@@ -252,25 +189,24 @@ export default function SubscreenA() {
     return (
         <Box className="w-full h-full border border-solid border-black">
             <Box className="flex-1 flex flex-col justify-center items-center gap-1 p-2">
-                {/* color picker + filter input */}
                 <Box className="w-full flex gap-2 justify-around">
                     <Box className="max-w-[150px] max-h-[250px] flex flex-col items-center">
                         <Box className="w-full grid grid-cols-6">
                             {basicColors.map((preset) => (
                                 <Box
-                                key={preset}
-                                onClick={() => {
-                                    setCurrentColor(preset);
-                                    addColorToList(preset);
-                                }}
-                                style={{
-                                    backgroundColor: preset,
-                                    width: 25,
-                                    height: 25,
-                                    borderRadius: 4,
-                                    cursor: "pointer",
-                                    border: preset === currentColor ? "3px solid black" : "1px solid #ccc"
-                                }}
+                                    key={preset}
+                                    onClick={() => {
+                                        setCurrentColor(preset);
+                                        addColorToList(preset);
+                                    }}
+                                    style={{
+                                        backgroundColor: preset,
+                                        width: 25,
+                                        height: 25,
+                                        borderRadius: 4,
+                                        cursor: "pointer",
+                                        border: preset === currentColor ? "3px solid black" : "1px solid #ccc"
+                                    }}
                                 />
                             ))}
                         </Box>
@@ -412,7 +348,6 @@ export default function SubscreenA() {
                         alignItems: "center",
                         zIndex: 1300,
                     }}
-                    // onClick={() => setOpenObjectFilter(false)} // click overlay để đóng
                 >
                     <Box
                         className="w-[95vw] h-[90vh] bg-white flex justify-center items-center p-5"

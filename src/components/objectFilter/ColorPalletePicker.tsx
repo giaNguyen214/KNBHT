@@ -3,16 +3,11 @@
 import { HexColorPicker } from "react-colorful";
 import React, { useState } from "react";
 import { 
-  Button, 
   Box, 
   TextField, 
   Typography,
   Autocomplete,
   IconButton,
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableRow
 } from "@mui/material";
 import { ColorPalletePickerProps } from "@/types/Color";
 import { cssColorNames } from "@/constants/color";
@@ -80,7 +75,6 @@ export default function ColorPalettePicker({selectedShape, setSelectedShape}: Co
     const hexRegex = /^#?([0-9A-Fa-f]{6})$/;
     const match = hexInput.match(hexRegex);
     if (match) {
-      // setColor(`#${match[1]}`);
       if (selectedShape) {
         setSelectedShape({ ...selectedShape, color: `#${match[1]}` });
       }
@@ -90,70 +84,69 @@ export default function ColorPalettePicker({selectedShape, setSelectedShape}: Co
   };
 
   const fields = ["name", "x_min", "y_min", "x_max", "y_max", "color"] as const;
-  type Field = typeof fields[number];
   
   return (
     <Box className="h-[85vh] w-full flex flex-col justify-center items-center gap-5">
       {/* Toggle cho only_bbox / only_color / only_name */}
-<Box className="flex flex-col gap-2 w-full">
-  <FormControlLabel
-    control={
-      <Switch
-        checked={!!selectedShape?.only_bbox}
-        onChange={(e) => {
-          if (!selectedShape) return;
-          const checked = e.target.checked;
-          // Cập nhật selectedShape
-          setSelectedShape({
-            ...selectedShape,
-            only_bbox: checked,
-            only_color: false,
-            only_name: false,
-          });
-        }}
-      />
-    }
-    label="Only BBox"
-  />
+      <Box className="flex flex-col gap-2 w-full">
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!selectedShape?.only_bbox}
+              onChange={(e) => {
+                if (!selectedShape) return;
+                const checked = e.target.checked;
+                // Cập nhật selectedShape
+                setSelectedShape({
+                  ...selectedShape,
+                  only_bbox: checked,
+                  only_color: false,
+                  only_name: false,
+                });
+              }}
+            />
+          }
+          label="Only BBox"
+        />
 
-  <FormControlLabel
-    control={
-      <Switch
-        checked={!!selectedShape?.only_color}
-        onChange={(e) => {
-          if (!selectedShape) return;
-          const checked = e.target.checked;
-          setSelectedShape({
-            ...selectedShape,
-            only_color: checked,
-            only_bbox: false,
-            only_name: false,
-          });
-        }}
-      />
-    }
-    label="Only Color"
-  />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!selectedShape?.only_color}
+              onChange={(e) => {
+                if (!selectedShape) return;
+                const checked = e.target.checked;
+                setSelectedShape({
+                  ...selectedShape,
+                  only_color: checked,
+                  only_bbox: false,
+                  only_name: false,
+                });
+              }}
+            />
+          }
+          label="Only Color"
+        />
 
-  <FormControlLabel
-    control={
-      <Switch
-        checked={!!selectedShape?.only_name}
-        onChange={(e) => {
-          if (!selectedShape) return;
-          const checked = e.target.checked;
-          setSelectedShape({
-            ...selectedShape,
-            only_name: checked,
-            only_bbox: false,
-            only_color: false,
-          });
-        }}
-      />
-    }
-    label="Only Name"
-  />
-</Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!selectedShape?.only_name}
+              onChange={(e) => {
+                if (!selectedShape) return;
+                const checked = e.target.checked;
+                setSelectedShape({
+                  ...selectedShape,
+                  only_name: checked,
+                  only_bbox: false,
+                  only_color: false,
+                });
+              }}
+            />
+          }
+          label="Only Name"
+        />
+      </Box>
 
 
       <Box className="w-full grid grid-cols-5 gap-2">
@@ -245,8 +238,6 @@ export default function ColorPalettePicker({selectedShape, setSelectedShape}: Co
       >
           Selected {selectedShape.color}
       </Typography>
-
-      
     </Box>
   );
 }

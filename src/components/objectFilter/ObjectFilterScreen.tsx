@@ -1,14 +1,11 @@
 "use client"
 
-// components/CanvasEditor.tsx
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { DraggableData } from 'react-rnd';
 
 import { CustomObject } from '@/types/Object';
-import { useObjectContext } from '@/contexts/objectContext';
 import CanvasEditor from './CanvasEditor';
-import { Rnd } from 'react-rnd';
 import { cocoObjects } from '@/constants/object';
 
 import ObjectList from './ObjectList';
@@ -24,12 +21,11 @@ const getRandomSize = (min: number, max: number) => {
 type ObjectFilterScreenProps = {
   shapesOnCanvas: CustomObject[];
   setShapesOnCanvas: React.Dispatch<React.SetStateAction<CustomObject[]>>;
+  setOpenObjectFilter: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 
 export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, setOpenObjectFilter}:ObjectFilterScreenProps ) {
-  // const {shapesOnCanvas, setShapesOnCanvas} = useObjectContext()
-
   const handleAddShape = (shapeTemplate: any) => {
     const x = 50;
     const y = 50;
@@ -45,7 +41,6 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, 
       color: shapeTemplate.color,
     };
     setShapesOnCanvas([...shapesOnCanvas, newShape]);
-    // console.log("shapeTemplate", shapeTemplate)
   };
 
   const handleDragStop = (
@@ -101,7 +96,6 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, 
       );
   };
 
-  // const names: string[] = ["human", "cat", "dog"];
   const names = cocoObjects
   
   const [defaultShapes, setDefaultShapes] = useState<CustomObject[]>([]);
