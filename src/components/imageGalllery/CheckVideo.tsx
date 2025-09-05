@@ -1,5 +1,12 @@
 import { Box, Typography, Dialog } from "@mui/material";
 import TranscriptPanel from "@/components/imageGalllery/TransciptPanel";
+import { fps } from "@/constants/fps";
+function getFpsForVideo(video_id: string): number | null {
+  if (fps[`${video_id}.mp4`] !== undefined) return fps[`${video_id}.mp4`];
+  if (fps[video_id] !== undefined) return fps[video_id];
+  return null;
+}
+
 
 interface CheckVideoProps {
   openImage: { img: string; title: string } | null;
@@ -96,8 +103,13 @@ export default function CheckVideo({
                 textAlign: "center",
               }}
             >
-              Tổng số keyframe: {groupImages.length}
+              Tổng số keyframe: {groupImages.length}{" "}
+              {(() => {
+                const fpsVal = getFpsForVideo(getFirstTwoParts(openImage.title));
+                return fpsVal ? `(FPS: ${fpsVal})` : "";
+              })()}
             </Typography>
+
 
             <Box sx={{ display: "flex", gap: 1, overflowX: "auto", mt: 2 }}>
               {groupImages.map((src) => {

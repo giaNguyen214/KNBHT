@@ -42,4 +42,5 @@ next-env.d.ts
 
 # keyframes
 /public/assets/
+/public/data/
 src/itemData.json
