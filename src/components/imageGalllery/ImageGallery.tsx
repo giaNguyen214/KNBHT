@@ -24,7 +24,7 @@ import { useIgnoreImageContext } from "@/contexts/ignoreContext";
 
 import CustomAvatar from "../utils/CustomAvatar";
 import socket from "@/lib/socket";
-import CheckImage from "./CheckVideo";
+import CheckVideo from "./CheckVideo";
 
 
 import assetsIndexL from "@/data/assetsIndex_L.json";
@@ -346,7 +346,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                 </Button>
             </Box>
             
-            <CheckImage
+            <CheckVideo
                 openImage={openImage}
                 setOpenImage={setOpenImage}
                 groupImages={groupImages}

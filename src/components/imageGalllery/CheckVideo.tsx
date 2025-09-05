@@ -16,7 +16,6 @@ export default function CheckVideo({
   currentTimestamp,
   setCurrentTimestamp,
 }: CheckVideoProps) {
-  // 🧩 Các hàm tiện ích gắn liền với keyframe file naming convention
   const getTimestampFromFilename = (filename: string): string => {
     const match = filename.match(/_(\d+\.\d+)s\.jpg$/);
     return match ? match[1] : "0.00";
@@ -120,7 +119,7 @@ export default function CheckVideo({
                         cursor: "pointer",
                         border:
                           openImage.img === src
-                            ? "2px solid #1976d2"
+                            ? "5px solid yellow"
                             : "1px solid #ccc",
                       }}
                       onClick={() => {
