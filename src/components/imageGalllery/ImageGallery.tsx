@@ -165,7 +165,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
         return name.split("_").slice(0, 2).join("_");
     }
 
-    function useGroupImages(filename: string) {
+    function getGroupImages(filename: string) {
         if (!filename) return [];
 
         const part = getFirstPart(filename);        // ví dụ "L30"
@@ -189,7 +189,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
         return lastPart.replace("s", ""); // "0300.60"
     }
 
-    const groupImages = openImage ? useGroupImages(openImage.title) : [];
+    const groupImages = openImage ? getGroupImages(openImage.title) : [];
 
     const [currentTimestamp, setCurrentTimestamp] = useState<number | null>(null);
 
