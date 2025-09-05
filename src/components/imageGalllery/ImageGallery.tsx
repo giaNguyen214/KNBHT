@@ -199,7 +199,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                 {paginatedResults.map((item, index) => {
                     const globalIndex = startIndex + index; // dùng để index vào showList
                     const filename = item.keyframe_id
-                    let imgSrc = `${base_folder}/${getFirstPart(filename)}/${getFirstTwoParts(filename)}/${filename}`; // mặc định
+                    const imgSrc = `${base_folder}/${getFirstPart(filename)}/${getFirstTwoParts(filename)}/${filename}`; // mặc định
                     const imgTitle = `${item.keyframe_id}`;
 
                     return (

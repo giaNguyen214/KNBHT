@@ -13,7 +13,7 @@ interface AnswerCellProps {
   value: string;
   onChange: (val: string) => void;
 }
-const AnswerCell: React.FC<AnswerCellProps> = React.memo(({ value, onChange }) => {
+const AnswerCellComponent: React.FC<AnswerCellProps> = ({ value, onChange }) => {
   return (
     <TextField
       size="small"
@@ -21,9 +21,13 @@ const AnswerCell: React.FC<AnswerCellProps> = React.memo(({ value, onChange }) =
       onChange={(e) => onChange(e.target.value)}
     />
   );
-});
+};
+AnswerCellComponent.displayName = "AnswerCell";
 
-const KEYFRAME_RE = /^(L\d+_V\d{3})_(\d+(?:\.\d+)?)s\.jpg$/;
+const AnswerCell = React.memo(AnswerCellComponent);
+
+
+const KEYFRAME_RE = /^([LK]\d+_V\d{3})_(\d+(?:\.\d+)?)s\.jpg$/;
 
 function parseKeyframeId(keyframe_id: string) {
   const m = keyframe_id.match(KEYFRAME_RE);
@@ -59,60 +63,86 @@ interface TableRowProps {
   showAnswer: boolean;
 }
 
-const TableRowItem: React.FC<TableRowProps> = React.memo(
-  ({ row, isFirst, isLast, editableOriginalIndex, onEdit, onDelete, onMove, showAnswer }) => {
+const TableRowItemComponent: React.FC<TableRowProps> = ({
+  row,
+  isFirst,
+  isLast,
+  editableOriginalIndex,
+  onEdit,
+  onDelete,
+  onMove,
+  showAnswer
+}) => {
+  return (
+    <tr>
+      <td style={{ textAlign: "center" }}>{row.index + 1}</td>
 
-    return (
-      <tr>
-        <td style={{ textAlign: "center" }}>{row.index + 1}</td>
-
-        <td style={{ textAlign: "center" }}>
-          {row.originalIndex === editableOriginalIndex ? (
-            <TextField
-              size="small"
-              placeholder="L29_V005_0113.96s.jpg"
-              value={row.keyframe_id}
-              onChange={(e) => onEdit(row.originalIndex, "keyframe_id", e.target.value)}
-            />
-          ) : (
-            <span>{row.keyframe_id}</span>
-          )}
-        </td>
-
-        <td style={{ textAlign: "center" }}>{row.video_id}</td>
-        <td style={{ textAlign: "center" }}>{Number.isFinite(row.timestamp) ? row.timestamp : ""}</td>
-        <td style={{ textAlign: "center" }}>{row.fps ?? ""}</td>
-        <td style={{ textAlign: "center" }}>{row.frame_id ?? ""}</td>
-
-        {showAnswer && (
-          <td style={{ textAlign: "center" }}>
-            <AnswerCell value={row.answer} onChange={(val) => onEdit(row.originalIndex, "answer", val)} />
-          </td>
+      <td style={{ textAlign: "center" }}>
+        {row.originalIndex === editableOriginalIndex ? (
+          <TextField
+            size="small"
+            placeholder="L29_V005_0113.96s.jpg"
+            value={row.keyframe_id}
+            onChange={(e) => onEdit(row.originalIndex, "keyframe_id", e.target.value)}
+          />
+        ) : (
+          <span>{row.keyframe_id}</span>
         )}
+      </td>
 
-        <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-          <IconButton size="small" onClick={() => onMove(row.originalIndex, -1)} disabled={isFirst}>
-            <KeyboardArrowUpIcon />
-          </IconButton>
-          <IconButton size="small" onClick={() => onMove(row.originalIndex, +1)} disabled={isLast}>
-            <KeyboardArrowDownIcon />
-          </IconButton>
-        </td>
+      <td style={{ textAlign: "center" }}>{row.video_id}</td>
+      <td style={{ textAlign: "center" }}>
+        {Number.isFinite(row.timestamp) ? row.timestamp : ""}
+      </td>
+      <td style={{ textAlign: "center" }}>{row.fps ?? ""}</td>
+      <td style={{ textAlign: "center" }}>{row.frame_id ?? ""}</td>
 
+      {showAnswer && (
         <td style={{ textAlign: "center" }}>
-          <IconButton onClick={() => onDelete(row.originalIndex)}>
-            <DeleteIcon />
-          </IconButton>
+          <AnswerCell
+            value={row.answer}
+            onChange={(val) => onEdit(row.originalIndex, "answer", val)}
+          />
         </td>
-      </tr>
-    );
-  },
+      )}
+
+      <td style={{ textAlign: "center", whiteSpace: "nowrap" }}>
+        <IconButton
+          size="small"
+          onClick={() => onMove(row.originalIndex, -1)}
+          disabled={isFirst}
+        >
+          <KeyboardArrowUpIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          onClick={() => onMove(row.originalIndex, +1)}
+          disabled={isLast}
+        >
+          <KeyboardArrowDownIcon />
+        </IconButton>
+      </td>
+
+      <td style={{ textAlign: "center" }}>
+        <IconButton onClick={() => onDelete(row.originalIndex)}>
+          <DeleteIcon />
+        </IconButton>
+      </td>
+    </tr>
+  );
+};
+
+TableRowItemComponent.displayName = "TableRowItem";
+
+const TableRowItem = React.memo(
+  TableRowItemComponent,
   (prev, next) =>
     prev.row.keyframe_id === next.row.keyframe_id &&
     prev.row.answer === next.row.answer &&
     prev.editableOriginalIndex === next.editableOriginalIndex &&
     prev.showAnswer === next.showAnswer
 );
+
 
 interface ResultModalProps {
   submit: boolean;
