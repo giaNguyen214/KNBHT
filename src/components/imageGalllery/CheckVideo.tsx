@@ -6,6 +6,7 @@ function getFpsForVideo(video_id: string): number | null {
   if (fps[video_id] !== undefined) return fps[video_id];
   return null;
 }
+import { useEffect, useState } from "react";
 import TimestampFrameConverter from "@/components/utils/TimestampFrameConverter";
 
 
@@ -16,6 +17,44 @@ interface CheckVideoProps {
   currentTimestamp: number | null;
   setCurrentTimestamp: (val: number) => void;
 }
+
+// Hàm đọc file từ public (client-side)
+const getVideoContent = async (videoId: string, folder: string): Promise<string> => { 
+  try {
+    const res = await fetch(`/data/transcript_summary_gemini/analysis_${folder}.txt`);
+    if (!res.ok) throw new Error("Không tìm thấy file txt");
+    const text = await res.text();
+
+    const lines = text.split("\n");
+    let inside = false;
+    const content: string[] = [];
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+
+      if (line.startsWith("## ")) {
+        const currentId = line.replace("## ", "").trim();
+
+        if (currentId === videoId) {
+          inside = true;
+          content.push(rawLine); // ✅ thêm dòng tiêu đề vào kết quả
+          continue;
+        } else if (inside) {
+          break; // đã xong block
+        }
+      }
+
+      if (inside) content.push(rawLine);
+    }
+
+    return content.join("\n").trim();
+  } catch (err) {
+    console.error("❌ Lỗi đọc file:", err);
+    return "";
+  }
+};
+
+
 
 export default function CheckVideo({
   openImage,
@@ -38,13 +77,26 @@ export default function CheckVideo({
     return parts.length >= 2 ? `${parts[0]}_${parts[1]}` : filename;
   };
 
+
+  const [analysis, setAnalysis] = useState("");
+
+  useEffect(() => {
+    if (openImage) {
+      const videoId = getFirstTwoParts(openImage.title);
+      const folder = getFirstPart(openImage.title);
+      getVideoContent(videoId, folder).then(setAnalysis);
+    }
+  }, [openImage]);
+
   return (
     <Dialog
       open={!!openImage}
       onClose={() => setOpenImage(null)}
-      maxWidth="lg"
+      // fullScreen
+      maxWidth={false}
       PaperProps={{
         sx: {
+          width: "90vw",
           height: "100vh",
           maxHeight: "100vh",
           margin: 0,
@@ -60,7 +112,7 @@ export default function CheckVideo({
           <Box
             className="h-full overflow-y-auto border border-solid border-gray-300 rounded p-2"
             sx={{
-              width: "30%",
+              width: "20%",
               minWidth: 280,
               fontFamily: "monospace",
               fontSize: 14,
@@ -174,6 +226,70 @@ export default function CheckVideo({
               })}
             </Box>
           </Box>
+
+          {/* Transcript summary gemini */}
+          <Box
+            className="h-full border border-solid border-gray-300 rounded"
+            sx={{
+              width: "20%",
+              minWidth: 280,
+              display: "flex",
+              flexDirection: "column",   // chia dọc: header + body
+              backgroundColor: "#fafafa",
+              fontFamily: "monospace",
+              fontSize: 12,
+              lineHeight: 1.5,
+              color: "#333",
+            }}
+          >
+            {/* Header */}
+            <Box
+              sx={{
+                backgroundColor: "#fff",
+                borderBottom: "1px solid #ddd",
+                borderRadius: "6px 6px 0 0",
+                p: 1,
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#1976d2",
+                  fontSize: 13,
+                  textAlign: "center",
+                }}
+              >
+                Transcript summary Gemini
+              </Typography>
+            </Box>
+
+            {/* Body */}
+            <Box
+              sx={{
+                flex: 1,                  // chiếm phần còn lại
+                overflowY: "auto",        // scroll khi cần
+                p: 2,
+              }}
+            >
+              <Box
+                component="pre"
+                sx={{
+                  m: 0,
+                  fontFamily: "monospace",
+                  fontSize: 14,
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
+                {analysis}
+              </Box>
+            </Box>
+          </Box>
+
+
+
+
         </Box>
       )}
     </Dialog>
