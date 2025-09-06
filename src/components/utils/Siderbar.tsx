@@ -160,7 +160,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
               <AssessmentIcon />
             </ListItemIcon>
             <ListItemText
-              primary="Submit"
+              primary="Results"
               slotProps={{
                 primary: {
                   sx: {

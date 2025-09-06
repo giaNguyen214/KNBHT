@@ -23,7 +23,6 @@ interface Row {
 }
 import ExportButton from "@/components/utils/ExportButton"
 
-
 export default function SubmitPage() {
   const [videoId, setVideoId] = useState("");
   const [frameId, setFrameId] = useState("");
@@ -33,72 +32,85 @@ export default function SubmitPage() {
   const [eventCount, setEventCount] = useState<number>(2);
   const [trakeFrames, setTrakeFrames] = useState<string[]>([]);
 
-  const generateRows = () => {
-    const newRows: Row[] = [];
 
-    if (mode === "trake") {
-      // fill đủ 100 dòng cho TRAKE
-      for (let i = 0; i < 100; i++) {
-        const row: Row = {
-          id: i,
-          order: i + 1,
-          video_id: videoId,
-          frame_id: "", // không dùng frame_id chính trong TRAKE
-        };
-        for (let j = 1; j <= eventCount; j++) {
-          row[`frame_id_${j}`] = trakeFrames[j - 1] ?? "";
-        }
-        newRows.push(row);
+
+const generateRows = (maxFrameId: number) => {
+  const newRows: Row[] = [];
+
+  const baseFrame = parseInt(frameId, 10);
+  if (isNaN(baseFrame)) return;
+
+  // hàng 1: input
+  newRows.push({
+    id: 0,
+    order: 1,
+    video_id: videoId,
+    frame_id: String(baseFrame),
+    qa_text: "",
+  });
+
+  // hàng 2–5: trống
+  for (let i = 2; i <= 5; i++) {
+    newRows.push({
+      id: i - 1,
+      order: i,
+      video_id: videoId,
+      frame_id: "",
+      qa_text: "",
+    });
+  }
+
+  const fpsVal = getFpsForVideo?.(videoId) ?? 1;
+  let offset = 1;
+  let mode: "normal" | "onlyUp" | "onlyDown" = "normal";
+
+  for (let i = 6; i <= 100; i++) {
+    let val: number;
+
+    if (mode === "normal") {
+      const isEven = i % 2 === 0;
+      val = isEven
+        ? baseFrame + offset * fpsVal
+        : baseFrame - offset * fpsVal;
+
+      if (val <= 0) {
+        val = 0;
+        mode = "onlyUp";
+      } else if (val >= maxFrameId) {
+        val = maxFrameId;
+        mode = "onlyDown";
       }
+
+      if (!isEven) offset++; // sau khi có cặp thì tăng offset
+    } else if (mode === "onlyUp") {
+      val = baseFrame + offset * fpsVal;
+      if (val >= maxFrameId) val = maxFrameId;
+      offset++;
     } else {
-      const baseFrame = parseInt(frameId, 10);
-      if (isNaN(baseFrame)) return;
-
-      // dòng đầu tiên = đúng input
-      newRows.push({
-        id: 0,
-        order: 1,
-        video_id: videoId,
-        frame_id: frameId,
-        qa_text: "",
-      });
-
-      // spam ±25, đủ 100 dòng
-      let idx = 2;
-      for (let offset = -25; offset <= 25; offset++) {
-        if (offset === 0) continue;
-        const val = baseFrame + offset;
-
-        newRows.push({
-          id: idx - 1,
-          order: idx,
-          video_id: videoId,
-          frame_id: String(val),
-          qa_text: "",
-        });
-        idx++;
-        if (newRows.length >= 100) break;
-      }
-
-      while (newRows.length < 100) {
-        newRows.push({
-          id: newRows.length,
-          order: newRows.length + 1,
-          video_id: videoId,
-          frame_id: String(baseFrame + newRows.length),
-          qa_text: "",
-        });
-      }
+      val = baseFrame - offset * fpsVal;
+      if (val <= 0) val = 0;
+      offset++;
     }
 
-    setRows(newRows);
-  };
+    newRows.push({
+      id: i - 1,
+      order: i,
+      video_id: videoId,
+      frame_id: String(val),
+      qa_text: "",
+    });
+  }
+
+  setRows(newRows);
+};
+
+
 
   const downloadCSV = () => {
     if (!rows || rows.length === 0) {
-    alert("❌ Không có dữ liệu để download!");
-    return;
-  }
+      alert("❌ Không có dữ liệu để download!");
+      return;
+    }
 
 
     let lines: string[];
@@ -233,9 +245,34 @@ export default function SubmitPage() {
             />
           )}
 
-          <Button variant="contained" onClick={generateRows}>
-            Generate
-          </Button>
+
+
+          <Button
+  variant="contained"
+  onClick={async () => {
+    if (!videoId) {
+      console.warn("❌ Chưa nhập videoId");
+      return;
+    }
+
+    const res = await fetch(`/api/max-frame-id?videoId=${videoId}`);
+    const data = await res.json();
+
+    if (data.error) {
+      console.error("Lỗi:", data.error);
+      return;
+    }
+
+    console.log(`max frame id cho ${videoId} là ${data.maxFrameId} (từ timestamp ${data.timestamp}s, fps=${data.fps})`);
+
+    generateRows(data.maxFrameId);
+  }}
+>
+  Generate
+</Button>
+
+
+
 
         </Box>
 
