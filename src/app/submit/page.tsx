@@ -156,6 +156,38 @@ export default function SubmitPage() {
   }
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  async function exportToGoogleSheet(data: any) {
+  const res = await fetch("/api/export", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+
+  if (json.needConfirm) {
+    const ok = window.confirm(json.message || "Tab đã tồn tại, replace?");
+    if (ok) {
+      // Gửi lại request với forceReplace = true
+      const retry = await fetch("/api/export", {
+        method: "POST",
+        body: JSON.stringify({ ...data, forceReplace: true }),
+      });
+      const retryJson = await retry.json();
+      if (retryJson.success) {
+        alert("✅ Replace thành công!");
+        window.open(retryJson.url, "_blank");
+      } else {
+        alert("❌ Lỗi: " + retryJson.error);
+      }
+    }
+  } else if (json.success) {
+    alert("✅ Xuất dữ liệu thành công!");
+    window.open(json.url, "_blank");
+  } else {
+    alert("❌ Lỗi: " + json.error);
+  }
+}
+
   
   return (
     <Box className="p-4 space-y-4">
@@ -250,6 +282,22 @@ export default function SubmitPage() {
             <Button variant="contained" onClick={generateRows}>
             Generate
             </Button>
+
+           <Button
+  variant="contained"
+  color="success"
+  onClick={() =>
+    exportToGoogleSheet({
+      rows,
+      queryName,
+      mode,
+      eventCount,
+    })
+  }
+>
+  Export to Google Sheet
+</Button>
+
         </Box>
 
         <div style={{ height: 500, width: "100%" }}>

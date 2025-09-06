@@ -16,6 +16,7 @@
     "@mui/material": "^7.3.2",
     "@mui/x-data-grid": "^8.11.1",
     "axios": "^1.11.0",
+    "googleapis": "^159.0.0",
     "mui-color-input": "^7.0.0",
     "next": "15.4.4",
     "papaparse": "^5.5.3",

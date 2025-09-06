@@ -287,6 +287,8 @@ export default function SubmitTable({ submit, closeSubmitModal, results, mode }:
             <Button variant="contained" onClick={downloadFrameTxt}>
               Tải xuống
             </Button>
+
+            
           </Box>
 
           <Box className="h-[80vh] overflow-auto">
