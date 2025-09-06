@@ -15,6 +15,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ListItemButton from '@mui/material/ListItemButton';
 import { SidebarProps } from '@/types/Utils';
 import { useTheme } from '@mui/material';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 import { useRouter } from 'next/navigation';
 
@@ -147,6 +148,30 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
             />
           </ListItemButton>
 
+          {/* Results */}
+          <ListItemButton
+            component="a"
+            href="/results"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ gap: 0.5, minHeight: 40 }}
+          >
+            <ListItemIcon sx={{ minWidth: 30 }}>
+              <AssessmentIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Submit"
+              slotProps={{
+                primary: {
+                  sx: {
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                  },
+                },
+              }}
+            />
+          </ListItemButton>
+
           {/* Đăng xuất */}
           <ListItemButton
             onClick={handleLogOut}
@@ -167,6 +192,10 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
               }}
             />
           </ListItemButton>
+
+
+
+
         </List>
       </Drawer>
     </div>
