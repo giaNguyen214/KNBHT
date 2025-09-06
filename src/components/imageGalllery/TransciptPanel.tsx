@@ -68,7 +68,8 @@ export default function TranscriptPanel({ videoId, folder, currentTimestamp }: T
           sx={{
             fontSize: 12,
             fontFamily: "monospace",
-            color: "#888",
+            color: "#311B92",
+            fontWeight:'bold',
             mb: 1,
           }}
         >

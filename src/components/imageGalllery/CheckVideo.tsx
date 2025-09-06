@@ -8,7 +8,8 @@ function getFpsForVideo(video_id: string): number | null {
 }
 import { useEffect, useState } from "react";
 import TimestampFrameConverter from "@/components/utils/TimestampFrameConverter";
-
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface CheckVideoProps {
   openImage: { img: string; title: string } | null;
@@ -44,7 +45,9 @@ const getVideoContent = async (videoId: string, folder: string): Promise<string>
         }
       }
 
-      if (inside) content.push(rawLine);
+      if (inside && !/^=+$/.test(line)) {
+        content.push(rawLine);
+      }
     }
 
     return content.join("\n").trim();
@@ -54,6 +57,15 @@ const getVideoContent = async (videoId: string, folder: string): Promise<string>
   }
 };
 
+function normalizeAnalysis(text: string): string {
+  return text
+    // heading cấp 2: *   **Tiêu đề:**
+    .replace(/^\*   \*\*(.+?):\*\*/gm, "## $1")
+    // heading cấp 3: *       **Tiêu đề:**
+    .replace(/^\*       \*\*(.+?):\*\*/gm, "### $1")
+    // heading cấp 4: *           **Tiêu đề:**
+    .replace(/^\*           \*\*(.+?):\*\*/gm, "#### $1");
+}
 
 
 export default function CheckVideo({
@@ -264,27 +276,107 @@ export default function CheckVideo({
               </Typography>
             </Box>
 
-            {/* Body */}
             <Box
               sx={{
-                flex: 1,                  // chiếm phần còn lại
-                overflowY: "auto",        // scroll khi cần
+                flex: 1,
+                overflowY: "auto",
                 p: 2,
+                backgroundColor: "#fafafa",
               }}
             >
-              <Box
-                component="pre"
-                sx={{
-                  m: 0,
-                  fontFamily: "monospace",
-                  fontSize: 14,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h2: ({ node, ...props }) => (
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        mt: 2,
+                        mb: 1,
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: "4px",
+                        fontWeight: "bold",
+                        fontSize: "18px",
+                        color: "#FB8C00",           // cam sáng
+                        backgroundColor: "#FFE0B2", // cam nhạt
+                      }}
+                      {...props}
+                    />
+                  ),
+
+                  strong: ({ node, ...props }) => {
+                    const text = String(props.children);
+
+                    if (text.endsWith(":")) {
+                      const depth = node?.position?.start?.column ?? 1;
+
+                      let color = "#F4511E"; // cam cháy mặc định
+                      let bg = "#FFCCBC";    // nền cam pastel
+                      let fontSize = "16px";
+
+                      if (depth <= 3) {
+                        color = "#E53935";  // đỏ tươi
+                        bg = "#FFCDD2";     // đỏ nhạt
+                        fontSize = "18px";
+                      } else if (depth <= 5) {
+                        color = "#00838F";  // cyan đậm
+                        bg = "#B2EBF2";     // cyan nhạt
+                        fontSize = "16px";
+                      }
+
+                      return (
+                        <span
+                          style={{
+                            display: "block",
+                            marginTop: "12px",
+                            marginBottom: "6px",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            fontWeight: "bold",
+                            fontSize,
+                            lineHeight: 1.7,
+                            color,
+                            backgroundColor: bg,
+                          }}
+                          {...props}
+                        />
+                      );
+                    }
+
+                    // bold thường
+                    return (
+                      <span
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: "15px",
+                          lineHeight: 1.7,
+                          color: "#000",
+                        }}
+                        {...props}
+                      />
+                    );
+                  },
+
+                  li: ({ node, ...props }) => (
+                    <li
+                      style={{
+                        marginBottom: "8px",
+                        fontSize: "15px",
+                        lineHeight: 1.7,
+                      }}
+                      {...props}
+                    />
+                  ),
+                  p: ({ node, ...props }) => (
+                    <Typography sx={{ mb: 1, fontSize: 15, lineHeight: 1.7 }} {...props} />
+                  ),
                 }}
               >
                 {analysis}
-              </Box>
+              </ReactMarkdown>
             </Box>
+
           </Box>
 
 
