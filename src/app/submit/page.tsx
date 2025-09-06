@@ -21,6 +21,8 @@ interface Row {
   qa_text?: string;
   [key: string]: any; // cho phép thêm frame_id_1, frame_id_2...
 }
+import ExportButton from "@/components/utils/ExportButton"
+
 
 export default function SubmitPage() {
   const [videoId, setVideoId] = useState("");
@@ -93,6 +95,12 @@ export default function SubmitPage() {
   };
 
   const downloadCSV = () => {
+    if (!rows || rows.length === 0) {
+    alert("❌ Không có dữ liệu để download!");
+    return;
+  }
+
+
     let lines: string[];
 
     if (mode === "qa") {
@@ -157,148 +165,115 @@ export default function SubmitPage() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  async function exportToGoogleSheet(data: any) {
-  const res = await fetch("/api/export", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-  const json = await res.json();
-
-  if (json.needConfirm) {
-    const ok = window.confirm(json.message || "Tab đã tồn tại, replace?");
-    if (ok) {
-      // Gửi lại request với forceReplace = true
-      const retry = await fetch("/api/export", {
-        method: "POST",
-        body: JSON.stringify({ ...data, forceReplace: true }),
-      });
-      const retryJson = await retry.json();
-      if (retryJson.success) {
-        alert("✅ Replace thành công!");
-        window.open(retryJson.url, "_blank");
-      } else {
-        alert("❌ Lỗi: " + retryJson.error);
-      }
-    }
-  } else if (json.success) {
-    alert("✅ Xuất dữ liệu thành công!");
-    window.open(json.url, "_blank");
-  } else {
-    alert("❌ Lỗi: " + json.error);
-  }
-}
-
   
   return (
     <Box className="p-4 space-y-4">
         <Sidebar open={drawerOpen} setOpen={setDrawerOpen}/>
 
-        <Box className="flex flex-wrap justify-center items-center gap-4">
-            <TextField
-            label="Video ID"
-            value={videoId}
-            onChange={(e) => setVideoId(e.target.value)}
-            size="small"
-            />
+        {/* Hàng 1: Điều khiển */}
+        <Box className="flex flex-wrap justify-center items-center gap-4 mb-4">
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setRows([])}
+          >
+            Xóa tất cả
+          </Button>
 
-            {mode === "trake" ? (
-            <Box className="flex gap-2">
-                {Array.from({ length: eventCount }, (_, i) => (
-                <TextField
-                    key={i}
-                    label={`Frame ${i + 1}`}
-                    size="small"
-                    value={trakeFrames[i] ?? ""}
-                    onChange={(e) => {
-                    const updated = [...trakeFrames];
-                    updated[i] = e.target.value;
-                    setTrakeFrames(updated);
-                    }}
-                />
-                ))}
-            </Box>
-            ) : (
-            <TextField
-                label="Frame ID"
-                value={frameId}
-                onChange={(e) => setFrameId(e.target.value)}
-                size="small"
-            />
-            )}
-
-            <TextField
+          <TextField
             label="File Name"
             value={queryName}
             onChange={(e) => setQueryName(e.target.value)}
             size="small"
-            />
+          />
 
-            {videoId && (
+          {videoId && (
             <Chip
-                label={`FPS: ${getFpsForVideo(videoId) ?? "N/A"}`}
-                color="primary"
-                variant="outlined"
-                sx={{ fontWeight: "bold" }}
+              label={`FPS: ${getFpsForVideo(videoId) ?? "N/A"}`}
+              color="primary"
+              variant="outlined"
+              sx={{ fontWeight: "bold" }}
             />
-            )}
+          )}
 
-            <FormControlLabel
+          <FormControlLabel
             control={
-                <Switch
+              <Switch
                 checked={mode === "qa"}
                 onChange={(e) => {
-                    setMode(e.target.checked ? "qa" : null);
-                    setTrakeFrames([]);
+                  setMode(e.target.checked ? "qa" : null);
+                  setTrakeFrames([]);
                 }}
-                />
+              />
             }
             label="Enable QA"
-            />
+          />
 
-            <FormControlLabel
+          <FormControlLabel
             control={
-                <Switch
+              <Switch
                 checked={mode === "trake"}
                 onChange={(e) => {
-                    setMode(e.target.checked ? "trake" : null);
-                    setTrakeFrames([]);
+                  setMode(e.target.checked ? "trake" : null);
+                  setTrakeFrames([]);
                 }}
-                />
+              />
             }
             label="Enable TRAKE"
-            />
+          />
 
-            {mode === "trake" && (
+          {mode === "trake" && (
             <TextField
-                label="Số lượng event"
-                type="number"
-                value={eventCount}
-                onChange={(e) => setEventCount(Number(e.target.value))}
-                size="small"
-                sx={{ width: 150 }}
+              label="Số lượng event"
+              type="number"
+              value={eventCount}
+              onChange={(e) => setEventCount(Number(e.target.value))}
+              size="small"
+              sx={{ width: 150 }}
             />
-            )}
+          )}
 
-            <Button variant="contained" onClick={generateRows}>
+          <Button variant="contained" onClick={generateRows}>
             Generate
-            </Button>
-
-           <Button
-  variant="contained"
-  color="success"
-  onClick={() =>
-    exportToGoogleSheet({
-      rows,
-      queryName,
-      mode,
-      eventCount,
-    })
-  }
->
-  Export to Google Sheet
-</Button>
+          </Button>
 
         </Box>
+
+        {/* Hàng 2: Input dữ liệu */}
+        <Box className="flex flex-wrap justify-center items-center gap-2">
+          <TextField
+            label="Video ID"
+            value={videoId}
+            onChange={(e) => setVideoId(e.target.value)}
+            size="small"
+          />
+
+          {mode === "trake" ? (
+            <Box className="flex flex-wrap gap-2">
+              {Array.from({ length: eventCount }, (_, i) => (
+                <TextField
+                  key={i}
+                  label={`Frame ${i + 1}`}
+                  size="small"
+                  value={trakeFrames[i] ?? ""}
+                  onChange={(e) => {
+                    const updated = [...trakeFrames];
+                    updated[i] = e.target.value;
+                    setTrakeFrames(updated);
+                  }}
+                />
+              ))}
+            </Box>
+          ) : (
+            <TextField
+              label="Frame ID"
+              value={frameId}
+              onChange={(e) => setFrameId(e.target.value)}
+              size="small"
+            />
+          )}
+        </Box>
+
 
         <div style={{ height: 500, width: "100%" }}>
             <DataGrid
@@ -315,13 +290,29 @@ export default function SubmitPage() {
             onProcessRowUpdateError={(error) => {
                 console.error("Update error:", error);
             }}
-            editMode="row"
+            editMode="cell"
             />
         </div>
 
-        <Button variant="contained" color="success" onClick={downloadCSV}>
-            Download CSV
-        </Button>
+        <Box className="flex justify-between">
+          <Button
+            variant="contained"
+            onClick={downloadCSV}
+            sx={{ 
+              backgroundColor: "orange",
+              color:'black', 
+              "&:hover": { backgroundColor: "#fb8c00" } }}
+          >
+              Download CSV
+          </Button>
+          
+          <ExportButton
+            rows={rows}
+            queryName={queryName}
+            mode={mode}
+            eventCount={eventCount}
+          />
+        </Box>
     </Box>
   );
 }

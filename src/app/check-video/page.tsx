@@ -6,10 +6,12 @@ import {
   Box, 
   Button, 
   TextField, 
-  Typography
+  Typography,
+  Chip
 } from "@mui/material";
-
+import TimestampFrameConverter from "@/components/utils/TimestampFrameConverter";
 import Sidebar from "@/components/utils/Siderbar";
+import { fps } from "@/constants/fps";
 
 import assetsIndexL from "@/data/assetsIndex_L.json";
 import assetsIndexK from "@/data/assetsIndex_K01_K20.json";
@@ -91,7 +93,14 @@ export default function Check() {
   };
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-              
+           
+  function getFpsForVideo(video_id: string): number | null {
+    if (fps[`${video_id}.mp4`] !== undefined) return fps[`${video_id}.mp4`];
+    if (fps[video_id] !== undefined) return fps[video_id];
+    return null;
+  }
+  
+
   return (
     <Box sx={{ p: 2 }}>
       <Sidebar open={drawerOpen} setOpen={setDrawerOpen}/>
@@ -108,6 +117,16 @@ export default function Check() {
           size="small"
           sx={{ width: 220 }}
         />
+
+        {videoId && (
+            <Chip
+              label={`FPS: ${getFpsForVideo(videoId) ?? "N/A"}`}
+              color="primary"
+              variant="outlined"
+              sx={{ fontWeight: "bold" }}
+            />
+        )}
+        
 
         <TextField
           label="Timestamp (vd: 12.34 hoặc .54, để trống mặc định là 0)"
@@ -126,6 +145,8 @@ export default function Check() {
           Xem
         </Button>
       </Box>
+
+      {videoId && <TimestampFrameConverter fps={getFpsForVideo(videoId)} />}
 
       <CheckImage
         openImage={openImage}

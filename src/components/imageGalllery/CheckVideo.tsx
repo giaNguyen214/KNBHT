@@ -1,4 +1,4 @@
-import { Box, Typography, Dialog } from "@mui/material";
+import { Box, Typography, Dialog, Chip } from "@mui/material";
 import TranscriptPanel from "@/components/imageGalllery/TransciptPanel";
 import { fps } from "@/constants/fps";
 function getFpsForVideo(video_id: string): number | null {
@@ -6,6 +6,7 @@ function getFpsForVideo(video_id: string): number | null {
   if (fps[video_id] !== undefined) return fps[video_id];
   return null;
 }
+import TimestampFrameConverter from "@/components/utils/TimestampFrameConverter";
 
 
 interface CheckVideoProps {
@@ -93,22 +94,40 @@ export default function CheckVideo({
               {openImage.title}
             </Typography>
 
-            <Typography
-              sx={{
-                fontSize: 12,
-                fontFamily: "monospace",
-                color: "#888",
-                mt: 2,
-                mb: 1,
-                textAlign: "center",
-              }}
-            >
-              Tổng số keyframe: {groupImages.length}{" "}
+            <Box sx={{ textAlign: "center", mt: 2, mb: 1 }}>
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  fontFamily: "monospace",
+                  color: "#888",
+                  display: "inline-block",
+                  mr: 1,
+                }}
+              >
+                Tổng số keyframe: {groupImages.length}
+              </Typography>
+
               {(() => {
                 const fpsVal = getFpsForVideo(getFirstTwoParts(openImage.title));
-                return fpsVal ? `(FPS: ${fpsVal})` : "";
+                return fpsVal ? (
+                  <Chip
+                    label={`FPS: ${fpsVal}`}
+                    size="small"
+                    sx={{
+                      backgroundColor: "#1a1a1a",     // đen xám dịu hơn
+                      color: "#76ff03",              // neon xanh lá nhưng nhạt
+                      fontWeight: "bold",
+                      border: "1px solid #76ff03",   // viền neon
+                      borderRadius: "8px",
+                      letterSpacing: "0.5px",
+                    }}
+                  />
+                ) : null;
               })()}
-            </Typography>
+            </Box>
+
+
+            {getFpsForVideo(getFirstTwoParts(openImage.title)) && <TimestampFrameConverter fps={getFpsForVideo(getFirstTwoParts(openImage.title))} />}
 
 
             <Box sx={{ display: "flex", gap: 1, overflowX: "auto", mt: 2 }}>
