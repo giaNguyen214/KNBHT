@@ -50,21 +50,21 @@ const generateRows = (maxFrameId: number) => {
   });
 
   // hàng 2–5: trống
-  for (let i = 2; i <= 5; i++) {
-    newRows.push({
-      id: i - 1,
-      order: i,
-      video_id: videoId,
-      frame_id: "",
-      qa_text: "",
-    });
-  }
+  // for (let i = 2; i <= 5; i++) {
+  //   newRows.push({
+  //     id: i - 1,
+  //     order: i,
+  //     video_id: videoId,
+  //     frame_id: "",
+  //     qa_text: "",
+  //   });
+  // }
 
   const fpsVal = getFpsForVideo?.(videoId) ?? 1;
   let offset = 1;
   let mode: "normal" | "onlyUp" | "onlyDown" = "normal";
 
-  for (let i = 6; i <= 100; i++) {
+  for (let i = 2; i <= 100; i++) {
     let val: number;
 
     if (mode === "normal") {

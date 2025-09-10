@@ -155,6 +155,7 @@ export default function Search() {
                                 <MenuItem value={"Lê Hiếu"}>Hiếu</MenuItem>
                                 <MenuItem value={"Duy Khương"}>Khương</MenuItem>
                                 <MenuItem value={"Duy Bảo"}>Bảo</MenuItem>
+                                <MenuItem value={""}>Full database</MenuItem>
                                 {/* <MenuItem value={"all"}>Full database</MenuItem> */}
                             </Select>
                         </FormControl>

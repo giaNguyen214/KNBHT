@@ -1,4 +1,5 @@
 import { DraggableData } from "react-rnd";
+import { CountMeta } from "./Search";
 
 export type CustomObject = {
     id: number;
@@ -20,6 +21,8 @@ export type ObjectListProps = {
     handleAddShape: (shapeTemplate: any) => void;
     setOpenObjectFilter: React.Dispatch<React.SetStateAction<boolean>>;
     shapesOnCanvas: CustomObject[];
+    countMeta: CountMeta;
+    setCountMeta: React.Dispatch<React.SetStateAction<CountMeta>>;
 }
 
 export type ObjectContextType = {

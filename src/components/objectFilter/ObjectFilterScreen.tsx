@@ -7,7 +7,7 @@ import { DraggableData } from 'react-rnd';
 import { CustomObject } from '@/types/Object';
 import CanvasEditor from './CanvasEditor';
 import { cocoObjects } from '@/constants/object';
-
+import { CountMeta } from '@/types/Search';
 import ObjectList from './ObjectList';
 
 const getRandomColor = () => {
@@ -22,10 +22,12 @@ type ObjectFilterScreenProps = {
   shapesOnCanvas: CustomObject[];
   setShapesOnCanvas: React.Dispatch<React.SetStateAction<CustomObject[]>>;
   setOpenObjectFilter: React.Dispatch<React.SetStateAction<boolean>>;
+  countMeta: CountMeta;
+  setCountMeta: React.Dispatch<React.SetStateAction<CountMeta>>;
 };
 
 
-export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, setOpenObjectFilter}:ObjectFilterScreenProps ) {
+export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, setOpenObjectFilter, countMeta, setCountMeta}:ObjectFilterScreenProps ) {
   const handleAddShape = (shapeTemplate: any) => {
     const x = 50;
     const y = 50;
@@ -118,6 +120,7 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, 
     setDefaultShapes(shapes);
   }, []);
 
+
   return (
     <Box className="w-screen h-screen flex justify-center items-center bg-white">
       {/* Sidebar: List shape */}
@@ -126,6 +129,8 @@ export default function ObjectFilterScreen( {shapesOnCanvas, setShapesOnCanvas, 
         handleAddShape={(shapeTemplate) => handleAddShape(shapeTemplate)}
         shapesOnCanvas={shapesOnCanvas}
         setOpenObjectFilter={setOpenObjectFilter}
+        countMeta={countMeta}               
+        setCountMeta={setCountMeta}         
       />
 
       {/* Canvas with grid */}

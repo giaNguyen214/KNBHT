@@ -17,6 +17,8 @@ import ResultModal from "../utils/SubmitTable";
 import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
 import { CustomObject } from "@/types/Object";
 import ObjectFilterScreen from "../objectFilter/ObjectFilterScreen";
+import { ObjectFilterConstraint, ObjectFilters, CountMeta } from "@/types/Search";
+
 
 function getContrastColor(bgColor: string) {
   // Bỏ dấu # nếu có
@@ -42,16 +44,22 @@ function hexToRgb(hex: string): [number, number, number] | null {
   return [r, g, b];
 }
 
-function convertShapes(shapesOnCanvas: CustomObject[]) {
-  const result: Record<string, [number[], number[]][]> = {};
+
+
+export function convertShapes(
+  shapesOnCanvas: CustomObject[],
+  countMeta: CountMeta,
+  send2server: boolean = false
+): ObjectFilters {
+  const constraints: Record<string, ObjectFilterConstraint> = {};
 
   for (const shape of shapesOnCanvas) {
-    let vec = hexToRgb(shape.color); // RGB từ color
+    let vec = hexToRgb(shape.color);
     let bbox = [
-        Math.round(shape.x_min),
-        Math.round(shape.y_min),
-        Math.round(shape.x_max),
-        Math.round(shape.y_max)
+      Math.round(shape.x_min),
+      Math.round(shape.y_min),
+      Math.round(shape.x_max),
+      Math.round(shape.y_max),
     ];
 
     if (shape.only_name) {
@@ -63,14 +71,44 @@ function convertShapes(shapesOnCanvas: CustomObject[]) {
       bbox = null;
     }
 
-    if (!result[shape.name]) {
-      result[shape.name] = [];
+    if (!constraints[shape.name]) {
+      constraints[shape.name] = [];
     }
-    result[shape.name].push([vec, bbox]);
+    constraints[shape.name].push([vec, bbox]);
   }
 
-  return result;
+  const finalResult: ObjectFilters = {};
+  for (const [name, cons] of Object.entries(constraints)) {
+    const meta = countMeta[name] ?? { type: "count", value: cons.length, show_constraint: false };
+
+    let baseObj: any = {};
+
+    // count / min_count / max_count
+    if (meta.type === "count") {
+      baseObj.count = meta.value;
+    } else if (meta.type === "min_count") {
+      baseObj.min_count = meta.value;
+    } else {
+      baseObj.max_count = meta.value;
+    }
+
+    if (send2server) {
+      // nếu gửi server → chỉ giữ constraint khi show_constraint = true
+      baseObj.constraint = meta.show_constraint ? cons : [];
+    } else {
+      // nếu client → giữ constraint và flag
+      baseObj.constraint = cons;
+      baseObj.show_constraint = !!meta.show_constraint;
+    }
+
+    finalResult[name] = baseObj;
+  }
+
+  return finalResult;
 }
+
+
+
 
 export default function Filter() {
     const { query, mode, topK, dataSource } = useSearchContext();
@@ -123,20 +161,20 @@ export default function Filter() {
 
         const rgbColors: [number, number, number][] = colors.map(hex => hexToRgb(hex));
 
-        const payload = {
-            text_query: query,
-            mode: mode,
-            object_filters: convertShapes(shapesOnCanvas),
-            color_filters: rgbColors,
-            ocr_query: ocrQuery,
-            asr_query: asrQuery,
-            top_k: topK
-        }
+        // const payload = {
+        //     text_query: query,
+        //     mode: mode,
+        //     object_filters: convertShapes(shapesOnCanvas),
+        //     color_filters: rgbColors,
+        //     ocr_query: ocrQuery,
+        //     asr_query: asrQuery,
+        //     top_k: topK
+        // }
 
         handleSearch({
             text_query: query,
             mode: mode,
-            object_filters: convertShapes(shapesOnCanvas),
+            object_filters: convertShapes(shapesOnCanvas, countMeta, true),
             color_filters: rgbColors,
             ocr_query: ocrQuery,
             asr_query: asrQuery,
@@ -184,6 +222,8 @@ export default function Filter() {
     }
 
     const [openObjectFilter, setOpenObjectFilter] = useState(false)
+    const [countMeta, setCountMeta] = useState<CountMeta>({});
+
     return (
         <Box className="w-full h-full border border-solid border-black">
             <Box className="flex-1 flex flex-col justify-center items-center gap-1 p-2">
@@ -367,6 +407,8 @@ export default function Filter() {
                             shapesOnCanvas={shapesOnCanvas}
                             setShapesOnCanvas={setShapesOnCanvas}
                             setOpenObjectFilter={setOpenObjectFilter}
+                            countMeta={countMeta}               
+                            setCountMeta={setCountMeta}         
                         />
                     </Box>
                 </Box>
