@@ -6,7 +6,7 @@ function getFpsForVideo(video_id: string): number | null {
   if (fps[video_id] !== undefined) return fps[video_id];
   return null;
 }
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import TimestampFrameConverter from "@/components/utils/TimestampFrameConverter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -57,16 +57,6 @@ const getVideoContent = async (videoId: string, folder: string): Promise<string>
   }
 };
 
-function normalizeAnalysis(text: string): string {
-  return text
-    // heading cấp 2: *   **Tiêu đề:**
-    .replace(/^\*   \*\*(.+?):\*\*/gm, "## $1")
-    // heading cấp 3: *       **Tiêu đề:**
-    .replace(/^\*       \*\*(.+?):\*\*/gm, "### $1")
-    // heading cấp 4: *           **Tiêu đề:**
-    .replace(/^\*           \*\*(.+?):\*\*/gm, "#### $1");
-}
-
 
 export default function CheckVideo({
   openImage,
@@ -92,6 +82,8 @@ export default function CheckVideo({
 
   const [analysis, setAnalysis] = useState("");
 
+
+
   useEffect(() => {
     if (openImage) {
       const videoId = getFirstTwoParts(openImage.title);
@@ -99,6 +91,36 @@ export default function CheckVideo({
       getVideoContent(videoId, folder).then(setAnalysis);
     }
   }, [openImage]);
+
+  // ref mảng cho tất cả thumbnail
+const thumbRefs = useRef<Record<string, HTMLImageElement | null>>({});
+
+const containerRef = useRef<HTMLDivElement | null>(null);
+
+
+  useEffect(() => {
+    if (!openImage) return;
+
+    const file2 = openImage.img.split("/").pop();
+
+    // trì hoãn 1 tick để chắc chắn ref đã được gắn
+    setTimeout(() => {
+      const el = file2 ? thumbRefs.current[file2] : null;
+      const container = containerRef.current;
+      if (el && container) {
+        container.scrollTo({
+          left: el.offsetLeft - container.clientWidth / 2 + el.clientWidth / 2,
+          behavior: "smooth",
+        });
+
+      } else {
+      }
+    }, 0);
+  }, [openImage]);
+
+
+
+
 
   return (
     <Dialog
@@ -194,9 +216,11 @@ export default function CheckVideo({
             {getFpsForVideo(getFirstTwoParts(openImage.title)) && <TimestampFrameConverter fps={getFpsForVideo(getFirstTwoParts(openImage.title))} />}
 
 
-            <Box sx={{ display: "flex", gap: 1, overflowX: "auto", mt: 2 }}>
-              {groupImages.map((src) => {
+            <Box ref={containerRef} sx={{ display: "flex", gap: 1, overflowX: "auto", mt: 2 }}>
+              {groupImages.map((src, idx) => {
                 const filename = src.split("/").pop() || "";
+                
+                
                 return (
                   <div
                     key={src}
@@ -204,6 +228,12 @@ export default function CheckVideo({
                     className="flex flex-col items-center"
                   >
                     <img
+                       ref={(el) => {
+  const filename = src.split("/").pop() || "";
+thumbRefs.current[filename] = el;
+
+}}
+
                       src={src}
                       alt={filename}
                       style={{
