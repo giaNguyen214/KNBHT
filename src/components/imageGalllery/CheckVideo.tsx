@@ -6,7 +6,7 @@ function getFpsForVideo(video_id: string): number | null {
   if (fps[video_id] !== undefined) return fps[video_id];
   return null;
 }
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import TimestampFrameConverter from "@/components/utils/TimestampFrameConverter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -98,7 +98,7 @@ export default function CheckVideo({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!openImage) return;
 
     const file2 = openImage.img.split("/").pop();
@@ -118,6 +118,21 @@ export default function CheckVideo({
       }
     }, delay);
   }, [openImage]);
+//   useLayoutEffect(() => {
+//   if (!openImage) return;
+
+//   const file2 = openImage.img.split("/").pop();
+//   const el = file2 ? thumbRefs.current[file2] : null;
+//   const container = containerRef.current;
+
+//   if (el && container) {
+//     container.scrollTo({
+//       left: el.offsetLeft - container.clientWidth / 2 + el.clientWidth / 2,
+//       behavior: "smooth",
+//     });
+//   }
+// }, [openImage]);
+
 
 
 

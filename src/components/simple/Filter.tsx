@@ -85,15 +85,15 @@ export function convertShapes(
 
     // count / min_count / max_count
     if (meta.type === "count") {
-  baseObj.count = meta.value;
-} else if (meta.type === "min_count") {
-  baseObj.min_count = meta.value;
-} else if (meta.type === "max_count") {
-  baseObj.max_count = meta.value;
-} else {
-  // fallback an toàn
-  baseObj.count = meta.value;
-}
+    baseObj.count = meta.value;
+    } else if (meta.type === "min_count") {
+    baseObj.min_count = meta.value;
+    } else if (meta.type === "max_count") {
+    baseObj.max_count = meta.value;
+    } else {
+    // fallback an toàn
+    baseObj.count = meta.value;
+    }
 
 
     if (send2server) {
