@@ -2,9 +2,6 @@ import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import serviceAccount from "../../../../service-account.json";
 
-
-
-
 export async function GET() {
   try {
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
@@ -12,31 +9,32 @@ export async function GET() {
 
     const auth = new google.auth.JWT({
       email: serviceAccount.client_email,
-      key: serviceAccount.private_key.replace(/\\n/g, "\n"), // fix lỗi xuống dòng
+      key: serviceAccount.private_key.replace(/\\n/g, "\n"),
       scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
     });
 
     await auth.authorize();
     const sheets = google.sheets({ version: "v4", auth });
 
-    // lấy metadata
+    // Lấy metadata: danh sách các sheet
     const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
     const sheetList = spreadsheet.data.sheets ?? [];
 
-    const results: { sheetName: string; firstRow: string[] }[] = [];
+    const titles = sheetList
+      .map((s) => s.properties?.title)
+      .filter((t): t is string => !!t);
 
-    for (const s of sheetList) {
-      const title = s.properties?.title;
-      if (!title) continue;
+    // Gọi batchGet cho tất cả sheetName cùng lúc
+    const resp = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId,
+      ranges: titles.map((t) => `${t}!1:1`),
+    });
 
-      const resp = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: `${title}!1:1`,
-      });
-
-      const firstRow = resp.data.values?.[0] ?? [];
-      results.push({ sheetName: title, firstRow });
-    }
+    // Map lại theo thứ tự titles
+    const results = titles.map((title, idx) => ({
+      sheetName: title,
+      firstRow: resp.data.valueRanges?.[idx]?.values?.[0] ?? [],
+    }));
 
     return NextResponse.json({ success: true, tabs: results });
   } catch (err: any) {

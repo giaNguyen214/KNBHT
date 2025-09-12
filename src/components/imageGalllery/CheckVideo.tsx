@@ -93,15 +93,16 @@ export default function CheckVideo({
   }, [openImage]);
 
   // ref mảng cho tất cả thumbnail
-const thumbRefs = useRef<Record<string, HTMLImageElement | null>>({});
+  const thumbRefs = useRef<Record<string, HTMLImageElement | null>>({});
 
-const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
 
   useEffect(() => {
     if (!openImage) return;
 
     const file2 = openImage.img.split("/").pop();
+    const delay = Math.floor(groupImages.length / 500) * 500 * 4;
 
     // trì hoãn 1 tick để chắc chắn ref đã được gắn
     setTimeout(() => {
@@ -115,7 +116,7 @@ const containerRef = useRef<HTMLDivElement | null>(null);
 
       } else {
       }
-    }, 0);
+    }, delay);
   }, [openImage]);
 
 
@@ -228,11 +229,10 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                     className="flex flex-col items-center"
                   >
                     <img
-                       ref={(el) => {
-  const filename = src.split("/").pop() || "";
-thumbRefs.current[filename] = el;
-
-}}
+                      ref={(el) => {
+                        const filename = src.split("/").pop() || "";
+                        thumbRefs.current[filename] = el;
+                      }}
 
                       src={src}
                       alt={filename}

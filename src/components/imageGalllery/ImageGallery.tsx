@@ -305,7 +305,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     shape="rounded" 
                 />
 
-                <FormControlLabel
+                {/* <FormControlLabel
                     label={`Ignore all page ${currentPage}`}
                     labelPlacement="top"
                     sx={{
@@ -329,9 +329,9 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                             color="success"
                         />
                     }
-                />
+                /> */}
 
-                <Button 
+                {/* <Button 
                     variant="contained" 
                     sx={{
                         backgroundColor: "#9c27b0",
@@ -343,7 +343,7 @@ export default function ImageGallery( {results, cols, className }: ImageGalleryP
                     onClick={sendHiddenTitles}
                     >
                     Ignore
-                </Button>
+                </Button> */}
             </Box>
             
             <CheckVideo
