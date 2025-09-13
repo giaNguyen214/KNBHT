@@ -29,7 +29,7 @@ import { useFetchIgnoredImages } from "@/hooks/getIgnoreInit";
 
 
 export default function Search() {    
-    const {query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK} = useSearchContext();
+    const {query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK, numQuery, setNumQuery} = useSearchContext();
     const {results, searching, handleSearch, cols, setCols} = useSearchResultContext()
 
     const [isOpen, setIsOpen] = useState(false)
@@ -65,7 +65,8 @@ export default function Search() {
             ocr_query: "",
             asr_query: "",
             top_k: topK,
-            user_query: dataSource
+            user_query: dataSource,
+            num_query: numQuery,
         });
 
         setCols(3);
@@ -110,6 +111,15 @@ export default function Search() {
         }
         setSubmit(true)
     }
+    const [tempNumQuery, setTempNumQuery] = useState("1"); // hiển thị input
+    useEffect(() => {
+        if (tempNumQuery === "") return; // khi đang xóa, chưa update
+
+        const parsed = parseInt(tempNumQuery, 10);
+        if (!isNaN(parsed) && parsed >= 1) {
+        setNumQuery(parsed);
+        }
+    }, [tempNumQuery]);
 
     return (
         <Box className="w-full h-full p-2 border border-solid border-black">
@@ -242,6 +252,43 @@ export default function Search() {
                             }}
                             sx={{ width: 100 }} // 👈 ép nhỏ hơn
                         />
+
+                        <TextField
+                            label="NumQuery"
+                            type="number"
+                            value={tempNumQuery}
+                            onChange={(e) => {
+                                const val = e.target.value;
+
+                                // Cho phép nhập rỗng
+                                setTempNumQuery(val);
+
+                                // Nếu val rỗng thì chưa update numQuery
+                                if (val === "") return;
+
+                                const parsed = parseInt(val, 10);
+                                if (!isNaN(parsed) && parsed >= 1) {
+                                setNumQuery(parsed);
+                                }
+                            }}
+                            onBlur={() => {
+                                // Khi blur, nếu người dùng bỏ trống hoặc <1 thì reset về 1
+                                if (tempNumQuery === "" || parseInt(tempNumQuery, 10) < 1) {
+                                setTempNumQuery("1");
+                                setNumQuery(1);
+                                }
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            inputProps={{
+                                min: 1,
+                            }}
+                            sx={{
+                                width: "100px",
+                            }}
+                            variant="outlined"
+                            />
 
                         <Button 
                             variant="contained" 

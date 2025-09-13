@@ -35,7 +35,9 @@ export type SearchContextType = {
   dataSource: string;
   setDataSource: React.Dispatch<React.SetStateAction<string>>;
   topK: number;
-  setTopK: React.Dispatch<React.SetStateAction<number>>
+  setTopK: React.Dispatch<React.SetStateAction<number>>;
+  numQuery: number;
+  setNumQuery: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export type SearchResultContextType = {

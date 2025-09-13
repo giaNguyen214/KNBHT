@@ -115,7 +115,7 @@ export function convertShapes(
 
 
 export default function Filter() {
-    const { query, mode, topK, dataSource } = useSearchContext();
+    const { query, mode, topK, dataSource, numQuery } = useSearchContext();
     const {results, searching, handleSearch} = useSearchResultContext()
     
     const [ocrQuery, setOcrQuery] = useState("");
@@ -183,7 +183,8 @@ export default function Filter() {
             ocr_query: ocrQuery,
             asr_query: asrQuery,
             top_k: topK,
-            user_query: dataSource
+            user_query: dataSource,
+            num_query: numQuery
         });
 
         fetchIgnoredImages(queryName)

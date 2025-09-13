@@ -14,6 +14,7 @@ export const simpleSearch = async (searchPayload: SearchPayload) => {
         asr_query: searchPayload.asr_query,
         top_k: searchPayload.top_k,
         user_query: searchPayload.user_query,
+        num_query: searchPayload.num_query
     };
 
     console.log("payload", JSON.stringify(payload, null, 2));

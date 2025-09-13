@@ -45,5 +45,6 @@ export type SearchPayload = {
     ocr_query: string,
     asr_query: string,
     top_k: number,
-    user_query: string
+    user_query: string,
+    num_query: number
 }

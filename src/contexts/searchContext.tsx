@@ -15,6 +15,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   const [topK, setTopK] = useState<number>(100)
 
   const [dataSource, setDataSource] = useState("");
+  const [numQuery, setNumQuery] = useState<number>(1)
   // Lấy localStorage khi chạy ở client
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -26,7 +27,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   
 
   return (
-    <SearchContext.Provider value={{ query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK }}>
+    <SearchContext.Provider value={{ query, setQuery, mode, setMode, queryName, setQueryName, dataSource, setDataSource, topK, setTopK, numQuery, setNumQuery }}>
       {children}
     </SearchContext.Provider>
   );

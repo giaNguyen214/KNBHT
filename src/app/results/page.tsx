@@ -91,17 +91,17 @@ const processedTabs = [...tabs].sort((a, b) => {
     .sort((a, b) => a - b);
 
   // indices đã là danh sách số thực có trong sheetNames
-const missingNumbers: number[] = [];
-if (indices.length > 0) {
-  const min = indices[0];
-  const max = 35
+  const missingNumbers: number[] = [];
+  if (indices.length > 0) {
+    const min = indices[0];
+    const max = 35
 
-  for (let i = min; i <= max; i++) {
-    if (!indices.includes(i)) {
-      missingNumbers.push(i);
+    for (let i = min; i <= max; i++) {
+      if (!indices.includes(i)) {
+        missingNumbers.push(i);
+      }
     }
   }
-}
 
 // Muốn render ra tên sheet dạng chuẩn thì thêm hậu tố tùy ý
 const missingSheetNames = missingNumbers.map(i => `query-${i}`);
