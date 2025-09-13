@@ -16,6 +16,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { SidebarProps } from '@/types/Utils';
 import { useTheme } from '@mui/material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 import { useRouter } from 'next/navigation';
 
@@ -78,104 +79,130 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
           </IconButton>
         </Box>
 
-        <List>
-          {/* Simple search → router.push */}
-          <ListItemButton
-            onClick={() => router.push('/simple')}
-            sx={{ gap: 0.5, minHeight: 40 }}
-          >
-            <ListItemIcon sx={{ minWidth: 30 }}>
-              <SearchIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Simple search"
-              slotProps={{
-                primary: {
-                  sx: {
-                    fontFamily: 'monospace',
-                    fontWeight: 600,
+        <List className="flex flex-col justify-between h-screen">
+          <Box>
+            {/* Simple search → router.push */}
+            <ListItemButton
+              onClick={() => router.push('/simple')}
+              sx={{ gap: 0.5, minHeight: 40 }}
+            >
+              <ListItemIcon sx={{ minWidth: 30 }}>
+                <SearchIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Simple search"
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                    },
                   },
-                },
-              }}
-            />
-          </ListItemButton>
+                }}
+              />
+            </ListItemButton>
 
-          {/* Submit → mở tab mới */}
-          <ListItemButton
-            component="a"
-            href="/submit"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ gap: 0.5, minHeight: 40 }}
-          >
-            <ListItemIcon sx={{ minWidth: 30 }}>
-              <UploadFileIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Submit"
-              slotProps={{
-                primary: {
-                  sx: {
-                    fontFamily: 'monospace',
-                    fontWeight: 600,
+            {/* Submit → mở tab mới */}
+            <ListItemButton
+              component="a"
+              href="/submit"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ gap: 0.5, minHeight: 40 }}
+            >
+              <ListItemIcon sx={{ minWidth: 30 }}>
+                <UploadFileIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Submit"
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                    },
                   },
-                },
-              }}
-            />
-          </ListItemButton>
+                }}
+              />
+            </ListItemButton>
 
-          {/* Check video → mở tab mới */}
-          <ListItemButton
-            component="a"
-            href="/check-video"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ gap: 0.5, minHeight: 40 }}
-          >
-            <ListItemIcon sx={{ minWidth: 30 }}>
-              <VideoLibraryIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Check video"
-              slotProps={{
-                primary: {
-                  sx: {
-                    fontFamily: 'monospace',
-                    fontWeight: 600,
+            {/* Check video → mở tab mới */}
+            <ListItemButton
+              component="a"
+              href="/check-video"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ gap: 0.5, minHeight: 40 }}
+            >
+              <ListItemIcon sx={{ minWidth: 30 }}>
+                <VideoLibraryIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Check video"
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                    },
                   },
-                },
-              }}
-            />
-          </ListItemButton>
+                }}
+              />
+            </ListItemButton>
 
-          {/* Results */}
-          <ListItemButton
-            component="a"
-            href="/results"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ gap: 0.5, minHeight: 40 }}
-          >
-            <ListItemIcon sx={{ minWidth: 30 }}>
-              <AssessmentIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Results"
-              slotProps={{
-                primary: {
-                  sx: {
-                    fontFamily: 'monospace',
-                    fontWeight: 600,
+            {/* Results */}
+            <ListItemButton
+              component="a"
+              href="/results"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ gap: 0.5, minHeight: 40 }}
+            >
+              <ListItemIcon sx={{ minWidth: 30 }}>
+                <AssessmentIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Results"
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                    },
                   },
-                },
-              }}
-            />
-          </ListItemButton>
+                }}
+              />
+            </ListItemButton>
+
+            <ListItemButton
+              component="a"
+              href="/question"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ gap: 0.5, minHeight: 40 }}
+            >
+              <ListItemIcon sx={{ minWidth: 30 }}>
+                <HelpOutlineIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Question"
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                    },
+                  },
+                }}
+              />
+            </ListItemButton>
+          </Box>
 
           {/* Đăng xuất */}
-          <ListItemButton
+          <Box className="mb-[50px]">
+            <ListItemButton
             onClick={handleLogOut}
-            sx={{ gap: 0.5, minHeight: 40 }}
+            sx={{ gap: 0.5, minHeight: 40}}
           >
             <ListItemIcon sx={{ minWidth: 30 }}>
               <LogoutIcon />
@@ -192,10 +219,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
               }}
             />
           </ListItemButton>
-
-
-
-
+          </Box>
         </List>
       </Drawer>
     </div>
