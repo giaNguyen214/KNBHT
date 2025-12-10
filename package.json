@@ -20,7 +20,7 @@
     "googleapis": "^159.0.0",
     "jszip": "^3.10.1",
     "mui-color-input": "^7.0.0",
-    "next": "15.4.4",
+    "next": "^15.4.6",
     "papaparse": "^5.5.3",
     "react": "19.1.0",
     "react-color": "^2.19.3",
